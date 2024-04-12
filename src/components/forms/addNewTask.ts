@@ -1,7 +1,7 @@
-import { store } from '../../store/store';
+import {  useTasksStore } from '../../store/useTasksStore.ts';
 import { renderTask } from '../task/renderTask';
 import { TaskType } from '../../store/types/types';
-
+const {tasksLength,addTask} = useTasksStore();
 export const addNewTask = () => {
   const form = document.querySelector<HTMLFormElement>('#form-new-task');
   const titleInput = document.querySelector<HTMLInputElement>('#new-task-title');
@@ -17,7 +17,7 @@ export const addNewTask = () => {
     };
 
     const getTaskFormData = () => {
-      const id = store.tasks.length;
+      const id = tasksLength + 1;
       const title = titleInput.value;
       const description = descriptionInput.value;
       const parentListId = 0;
@@ -44,7 +44,7 @@ export const addNewTask = () => {
 
       const newTask = getTaskFormData();
       if (newTask) {
-        store.addTask(newTask);
+        addTask(newTask);
         renderTask(newTask);
         toggleShowForm();
         form.reset();
