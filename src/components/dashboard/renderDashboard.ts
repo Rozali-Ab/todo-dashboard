@@ -1,5 +1,5 @@
-import { renderTask } from '../task/renderTask';
-import { renderList } from '../taskList/renderList';
+import { renderTask } from '../Task/renderTask';
+import { renderList } from '../TaskList/renderList';
 import { TaskListType, TaskType } from '../../store/types/types';
 
 const renderListsToDashboard = (taskLists: TaskListType[]) => {

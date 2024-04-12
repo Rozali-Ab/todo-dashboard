@@ -8,13 +8,13 @@ const { taskLists, tasks } = useTasksStore();
 
 const dashboard = document.querySelector<HTMLElement>('.dashboard');
 const addNewListBtn = document.querySelector<HTMLButtonElement>('#add-list-btn');
+const addNewTaskBtn = document.querySelector<HTMLButtonElement>('#add-new-Task');
 
-const addNewTaskBtn = document.querySelector<HTMLButtonElement>('#add-new-task');
-const draggableList = document.querySelector<HTMLDivElement>('.task-list');
+const draggableList = document.querySelector<HTMLDivElement>('.Task-list');
 
 if (dashboard && addNewListBtn && addNewTaskBtn && draggableList) {
   renderDashboard(taskLists, tasks);
-  // TODO  вынести в nav-bar
+  // TODO  вынести в NavBar
   addNewListBtn.addEventListener('click', () => addNewList());
 
   addNewTaskBtn.addEventListener('click', () => addNewTask());

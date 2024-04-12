@@ -8,7 +8,7 @@ export const renderList = (taskList: TaskListType) => {
 
   if (dashboard) {
     const listElement = document.createElement('div');
-    listElement.className = 'task-list';
+    listElement.className = 'Task-list';
     listElement.dataset.id = `${id}`;
     listElement.innerHTML = taskListView(taskList);
 

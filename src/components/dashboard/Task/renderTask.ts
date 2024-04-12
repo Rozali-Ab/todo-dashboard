@@ -7,10 +7,10 @@ export const renderTask = (task: TaskType) => {
   const {id, parentListId} = task;
 
   const listElement = document.querySelector(`.task-list[data-id="${parentListId}"]`) 
-    || document.querySelector('.task-list[data-id="0"]');
+    || document.querySelector('.Task-list[data-id="0"]');
 
   const taskElement = document.createElement('div');
-    taskElement.className = 'task';
+    taskElement.className = 'Task';
     taskElement.draggable = true;
     taskElement.dataset.id = `${id}`;
     taskElement.dataset.parentId = `${parentListId}`;
@@ -19,7 +19,7 @@ export const renderTask = (task: TaskType) => {
 
     listElement?.appendChild(taskElement);
 
-    taskElement.querySelector('#remove-task')?.addEventListener('click', () => {
+    taskElement.querySelector('#remove-Task')?.addEventListener('click', () => {
       onClickDeleteBtn(taskElement);
 
       listElement?.removeChild(taskElement);
