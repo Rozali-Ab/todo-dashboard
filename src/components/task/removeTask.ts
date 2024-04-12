@@ -1,6 +1,6 @@
-import { store } from '../../store/store';
-
+import {  useTasksStore } from '../../store/useTasksStore.ts';
+const {deleteTaskById} = useTasksStore();
 export const onClickDeleteBtn = (element: HTMLElement) => {
   const id = Number(element.dataset.id);
-  store.deleteTask(id);
+  deleteTaskById(id);
 };

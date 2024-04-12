@@ -1,5 +1,5 @@
-import { store } from '../../store/store';
-
+import { useTasksStore } from '../../store/useTasksStore.ts';
+const {updateTask} =  useTasksStore();
 type DragAndDropEventType = {
   currentList: HTMLElement;
   currentTask: HTMLElement;
@@ -29,7 +29,7 @@ export const dragAndDropEvent: DragAndDropEventType  = {
     task.dataset.parentId = this.currentList.dataset.id;
     const taskId = Number(this.currentTask.dataset.id);
     const taskParentId = Number(this.currentList.dataset.id);
-    store.updateTask(taskId, taskParentId);
+    updateTask(taskId, taskParentId);
 
   },
 

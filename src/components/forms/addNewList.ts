@@ -1,8 +1,10 @@
-import { store } from '../../store/store';
+import {  useTasksStore } from '../../store/useTasksStore.ts';
 import { renderList } from '../taskList/renderList';
 import { TaskListType } from '../../store/types/types';
 
+const {taskLists,addList} = useTasksStore();
 export const addNewList = () => {
+
   const addNewListBtn = document.querySelector<HTMLButtonElement>('.add-list-btn');
   const form = document.querySelector<HTMLFormElement>('#form-new-list');
   const input = document.querySelector<HTMLInputElement>('.form-new-list__input');
@@ -10,9 +12,9 @@ export const addNewList = () => {
 
   if (addNewListBtn && form && input && cancelBtn) {
     const getListFormData = () => {
-      const id = store.taskLists.length + 1;
+      const id = taskLists.length + 1;
       const title = input.value;
-      const order = store.taskLists.length + 1;
+      const order = taskLists.length + 1;
 
       if (title) {
         const listData: TaskListType = {
@@ -37,7 +39,7 @@ export const addNewList = () => {
 
       if (list) {
         renderList(list);
-        store.addList(list);
+        addList(list);
         toggleShowForm();
       }
 
