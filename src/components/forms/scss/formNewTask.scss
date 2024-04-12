@@ -1,0 +1,24 @@
+.form-new-task {
+  position: relative;
+  margin-bottom: 2rem;
+
+  &__input {
+    @include form-input;
+  }
+
+  &__textarea {
+    @include form-input;
+    overflow: hidden;
+    box-sizing: border-box;
+    resize: none;
+  }
+
+  .form-buttons {
+    @include fd-row;
+    justify-content: space-around;
+
+    button {
+      width: 10rem;
+    }
+  }
+}
