@@ -32,7 +32,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
   }
 
   if (mode === 'production') {
-    config.base = '/'
+    config.base = '/todo-dashboard'
   }
 
   return config;
