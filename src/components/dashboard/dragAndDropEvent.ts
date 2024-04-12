@@ -1,5 +1,6 @@
 import { useTasksStore } from '../../store/useTasksStore.ts';
 const {updateTask} =  useTasksStore();
+
 type DragAndDropEventType = {
   currentList: HTMLElement;
   currentTask: HTMLElement;

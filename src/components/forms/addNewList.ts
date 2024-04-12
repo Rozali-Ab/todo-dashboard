@@ -1,5 +1,5 @@
 import {  useTasksStore } from '../../store/useTasksStore.ts';
-import { renderList } from '../taskList/renderList';
+import { renderList } from '../TaskList/renderList';
 import { TaskListType } from '../../store/types/types';
 
 const {taskLists,addList} = useTasksStore();

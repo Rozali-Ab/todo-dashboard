@@ -2,20 +2,21 @@ import type { TaskListType, TaskType } from './types/types';
 
 const LOCAL_STORAGE_KEYS = {
   TASKS: 'tasks',
-  TASK_LIST:'task lists'
+  TASK_LIST:'Task lists'
 };
 
 // type StoreType = {
 //   taskLists: TaskListType[];
 //   tasks: TaskType[];
 //   addList(list: TaskListType): void;
-//   addTask(task: TaskType): void;
+//   creteNewTask(Task: TaskType): void;
 //   deleteList(id: number): void;
 //   deleteTaskById(id: number): void;
 //   updateTask(taskId: number, taskParentId: number): void;
 // }
 
 export const useTasksStore  = () => {
+    // TODO убрать @ts-ignore
     // @ts-ignore
     const taskLists: TaskListType[] =  JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.TASK_LIST) ) ||  [];
     // @ts-ignore
@@ -29,12 +30,12 @@ export const useTasksStore  = () => {
         localStorage.setItem(LOCAL_STORAGE_KEYS.TASK_LIST,JSON.stringify( payload));
     };
 
-    const      addList = (list: TaskListType) => {
+    const   addList = (list: TaskListType) => {
             taskLists.push(list);
             saveTasks(taskLists);
     };
 
-    const     addTask = (task: TaskType) => {
+    const   creteNewTask = (task: TaskType) => {
             tasks.push(task);
             saveTasks(tasks);
         };
@@ -63,20 +64,18 @@ export const useTasksStore  = () => {
                 updated.parentListId = taskParentId;
 
                 deleteTaskById(taskId);
-                addTask(updated);
+                creteNewTask(updated);
 
                 saveTaskLists(tasks);
             }
         };
 
     return {
-        get tasksLength () {
-           return tasks.length;
-        },
+
         taskLists,
         tasks,
         addList,
-        addTask,
+        creteNewTask,
         deleteList,
         deleteTaskById,
         updateTask,
