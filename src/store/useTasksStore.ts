@@ -1,83 +1,76 @@
-import type { TaskListType, TaskType } from './types/types';
+import type {ListType, TaskType} from './types/types';
+import {LOCAL_STORAGE_KEYS} from '../constants/const.ts';
 
-const LOCAL_STORAGE_KEYS = {
-  TASKS: 'tasks',
-  TASK_LIST:'Task lists'
+const getFromLocalStorage = (key: string) => {
+	const data = localStorage.getItem(key);
+
+	return data ? JSON.parse(data) : null;
 };
 
-// type StoreType = {
-//   taskLists: TaskListType[];
-//   tasks: TaskType[];
-//   addList(list: TaskListType): void;
-//   creteNewTask(Task: TaskType): void;
-//   deleteList(id: number): void;
-//   deleteTaskById(id: number): void;
-//   updateTask(taskId: number, taskParentId: number): void;
-// }
+const setToLocalStorage = (key: string, value: TaskType[] | ListType[]) => {
+	localStorage.setItem(key, JSON.stringify(value));
+};
 
-export const useTasksStore  = () => {
-    // TODO убрать @ts-ignore
-    // @ts-ignore
-    const taskLists: TaskListType[] =  JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.TASK_LIST) ) ||  [];
-    // @ts-ignore
-    const tasks:TaskType[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.TASKS) ) ||  [];
+export const useTasksStore = () => {
+	const tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
+	const lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
 
-    //state
-    const saveTasks = (payload : any ) => {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.TASKS,JSON.stringify( payload));
-    };
-    const saveTaskLists = (payload : any ) => {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.TASK_LIST,JSON.stringify( payload));
-    };
+	const saveTasks = () => {
+		setToLocalStorage(LOCAL_STORAGE_KEYS.TASKS, tasks);
+	};
 
-    const   addList = (list: TaskListType) => {
-            taskLists.push(list);
-            saveTasks(taskLists);
-    };
+	const saveLists = () => {
+		setToLocalStorage(LOCAL_STORAGE_KEYS.LISTS, lists);
+	};
 
-    const   creteNewTask = (task: TaskType) => {
-            tasks.push(task);
-            saveTasks(tasks);
-        };
+	const createTask = (title: string, description: string): TaskType => {
+		const task: TaskType = {
+			id: tasks.length,
+			title: title,
+			description: description,
+			parentListId: 0,
+		};
+		tasks.push(task);
+		saveTasks();
 
-    const        deleteList = (id) => {
-            const index = taskLists.findIndex(list => list.id === id);
-            if (index !== -1) {
-                taskLists.splice(index, 1);
-                saveTasks(taskLists);
-            }
-        };
+		return task;
+	};
 
-    const      deleteTaskById = (id) => {
-            const index = tasks.findIndex(task => task.id === id);
-            if (index !== -1) {
-                tasks.splice(index, 1);
-                saveTaskLists(tasks);
-            }
-        };
+	const createList = (title: string): ListType => {
+		const list: ListType = {
+			id: lists.length,
+			title: title,
+			order: lists.length
+		};
+		lists.push(list);
+		saveLists();
 
-     const    updateTask =  (taskId, taskParentId) => {
-// TODO переименовать
-            const updated = tasks.find(task => task.id === taskId);
+		return list;
+	};
 
-            if (updated) {
-                updated.parentListId = taskParentId;
+	const removeTaskById = (taskId: number) => {
+		const index = tasks.findIndex(task => task.id === taskId);
+		if (index !== -1) {
+			tasks.splice(index, 1);
+			saveTasks();
+		}
+	};
 
-                deleteTaskById(taskId);
-                creteNewTask(updated);
+	const updateTaskParentIdById = (taskId: number, parentId: number) => {
+		const updatedTask = tasks.find(task => task.id === taskId);
 
-                saveTaskLists(tasks);
-            }
-        };
+		if (updatedTask) {
+			updatedTask.parentListId = parentId;
+			saveTasks();
+		}
+	};
 
-    return {
-
-        taskLists,
-        tasks,
-        addList,
-        creteNewTask,
-        deleteList,
-        deleteTaskById,
-        updateTask,
-    };
+	return {
+		tasks,
+		lists,
+		createTask,
+		createList,
+		removeTaskById,
+		updateTaskParentIdById
+	};
 };
