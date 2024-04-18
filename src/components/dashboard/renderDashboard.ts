@@ -1,20 +1,14 @@
-import { renderTask } from '../Task/renderTask';
-import { renderList } from '../TaskList/renderList';
-import { TaskListType, TaskType } from '../../store/types/types';
+import {List} from './TaskList/List.ts';
+import {ListType, TaskType} from '../../store/types/types.ts';
 
-const renderListsToDashboard = (taskLists: TaskListType[]) => {
-  taskLists.forEach((list) => {
-    renderList(list);
-  });
-};
+export const renderDashboard = (lists: ListType[], tasks: TaskType[]) => {
+	const dashboard = document.querySelector<HTMLElement>('#dashboard');
 
-const renderTasksToLists = (tasks: TaskType[]) => {
-  tasks.forEach((task) => {
-    renderTask(task);
-  });
-};
-
-export const renderDashboard = (taskLists: TaskListType[], tasks: TaskType[]) => {
-  renderListsToDashboard(taskLists);
-  renderTasksToLists(tasks);
+	if (dashboard) {
+		lists.forEach((list) => {
+			const taskInList = tasks.filter(task => task.parentListId === list.id);
+			const listElement = List({list, tasks: taskInList});
+			dashboard.insertAdjacentHTML('beforeend', listElement);
+		});
+	}
 };

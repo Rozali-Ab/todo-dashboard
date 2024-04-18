@@ -23,11 +23,10 @@ export const useTasksStore = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.LISTS, lists);
 	};
 
-	const createTask = (title: string, description: string): TaskType => {
+	const createTask = ({title}: Record<string, string>) => {
 		const task: TaskType = {
 			id: tasks.length,
 			title: title,
-			description: description,
 			parentListId: 0,
 		};
 		tasks.push(task);
@@ -36,7 +35,8 @@ export const useTasksStore = () => {
 		return task;
 	};
 
-	const createList = (title: string): ListType => {
+	const createList = ({title}: Record<string, string>) => {
+
 		const list: ListType = {
 			id: lists.length,
 			title: title,

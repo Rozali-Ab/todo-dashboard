@@ -1,13 +1,21 @@
-import type { TaskType } from '../../store/types/types';
+import type {TaskType} from '../../../store/types/types';
 
-export const taskView = (task: TaskType) => {
-  const {
-    title,
-    description,
-  } = task;
+export const Task = (task: TaskType) => {
 
-  return `
-      <div class="task-tools">
+	const {
+		id,
+		title,
+		parentListId,
+	} = task;
+
+	return `
+	  <div
+	      class="task"
+	      draggable="true"
+	      data-id="${id}"
+	      data-parent-list-id="${parentListId}"
+	  >
+	      <div class="task-tools">
         <span 
           class="task-tools__edit"  
           id="edit-task"
@@ -21,11 +29,11 @@ export const taskView = (task: TaskType) => {
       </div>
       <div class="task-type">Work</div>
       <div class="task-title">${title}</div>
-      <div class="task-description">${description}</div>
       <div class="task-tags">
         <span class="task-tag">tag</span>
         <span class="task-tag">tag</span>
         <span class="task-tag">tag</span>
       </div>
+    </div>   
   `;
 };

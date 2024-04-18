@@ -1,92 +1,23 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./src/assets/svg/list.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="./src/assets/svg/list.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="./assets/css/style.css">
     <title>My TODO</title>
-  </head>
-  <body>
-    <header class="container">
-      <nav>
+</head>
+<body>
+<header class="container">
+    <nav>
         <button class="add-list-btn" id="add-list-btn">Add new list</button>
-        <form class="form-new-list hide" id="form-new-list">
-          <label class="form-new-list__label" for="new-list-name"></label>
-          <input
-            class="form-new-list__input"
-            type="text"
-            placeholder="New list title"
-            maxlength="30"
-            name="new-list-name"
-            id="new-list-name"
-            required
-          >
-          <div class="form-buttons">
-            <button
-              class="cancel"
-              type="button"
-              id="cancel-list"
-            >
-            </button>
-            <button
-              class="submit"
-              type="submit"
-              id="submit-list"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </nav>
-    </header>
-    <h1 class="container">Todo Dashboard</h1>
-    <main class="container">
-      <div class="dashboard" id="dashboard">
-        <div class="task-list" data-id="0">
-          <div class="task-list-header">
-            <div class="task-list-title">
-              Tasks today
-            </div>
-          </div>
-          <button
-            class="task-list__add-new-task-btn"
-            id="add-new-task"
-          >
-            Add new task
-          </button>
-          <form class="task form-new-task hide" id="form-new-task">
-            <label for="new-task-title">
-              Title
-            </label>
-            <input
-                class="form-new-task__input"
-                type="text"
-                placeholder="max 30 symbols"
-                maxlength="30"
-                name="new-task-title"
-                id="new-task-title"
-                required
-            />
-            <label for="new-task-description">
-              Description
-            </label>
-            <textarea
-              class="form-new-task__textarea"
-              maxlength="200"
-              placeholder="max 200 symbols"
-              name="new-task-description"
-              id="new-task-description"
-            ></textarea>
-            <div class="task-tags"></div>
-            <div class="form-buttons">
-              <button type="button" id="cancel-task">Cancel</button>
-              <button type="submit" id="submit-task">Save</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </main>
-    <script type="module" src="./index.ts"></script>
-  </body>
+        <button class="add-list-btn" id="add-new-task">Add new task</button>
+    </nav>
+</header>
+<h1 class="container">Todo Dashboard</h1>
+<main class="container">
+    <div class="dashboard" id="dashboard"></div>
+</main>
+<script type="module" src="./index.ts"></script>
+</body>
 </html>
