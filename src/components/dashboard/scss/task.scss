@@ -11,22 +11,18 @@
 
   &-type {
     padding: .2rem 1rem;
-    background-color: $color5;
+    background-color: $task-type;
     width: max-content;
     border-radius: $radius;
     font-size: 1rem;
   }
+
   &-title {
     margin-top: .5rem;
     font-size: 2rem;
     word-break: break-all;
   }
-  &-description {
-    margin-top: 1rem;
-    word-break: break-all;
-    color: $app-text-color-extra;
-    cursor: grab;
-  }
+
   &-tags {
     @include fd-row;
     justify-content: flex-end;
@@ -38,6 +34,7 @@
       color: $app-text-color-extra;
     }
   }
+
   &-tools {
     @include fd-row;
     padding-right: .1rem;
@@ -56,22 +53,23 @@
       background-repeat: no-repeat;
       filter: sepia(70%);
       transition: transform 0.3s ease-in-out;
-      
+
       &:hover {
         background-color: rgba(255, 255, 255, 0);
         box-shadow: none;
         transform: scale(1.3);
       }
     }
+
     &__edit {
       display: inline-block;
       margin-right: 1rem;
       cursor: text;
       transition: transform 0.3s ease-in-out;
+
       &:hover {
         transform: scale(1.5);
       }
     }
-
   }
 }

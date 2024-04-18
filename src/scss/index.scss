@@ -1,12 +1,9 @@
-@import
-  './fonts',
-  './global',
-  './mixins',
-  './variables';
+@import './fonts',
+'./global',
+'./mixins',
+'./variables';
 
-@import 
-  '@/components/dashboard/scss/dashboard',
-  '@/components/task/scss/task',
-  '@/components/taskList/scss/taskList',
-  '@/components/forms/scss/formNewList',
-  '@/components/forms/scss/formNewTask';
+@import '@/components/dashboard/scss/dashboard',
+'@/components/dashboard/scss/task',
+'@/components/dashboard/scss/taskList',
+'@/components/NavBar/scss/navbar';

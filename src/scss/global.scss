@@ -14,6 +14,7 @@ html {
 
 body {
   @include app-background;
+  position: relative;
   height: 100vh;
   font-size: 1.5rem;
   margin: 0;
@@ -23,8 +24,7 @@ body {
 }
 
 nav {
-  display: flex;
-  flex-direction: column;
+  @include fd-row;
 }
 
 button {
@@ -37,7 +37,7 @@ input, textarea, button {
 
 .container {
   padding: 1rem;
-  max-width: 150rem;
+  max-width: 160rem;
   margin: 0 auto;
   width: 100%;
 }
@@ -48,15 +48,4 @@ input, textarea, button {
 
 .blur {
   filter: blur(3px);
-}
-
-#add-list-btn {
-  height: 60px;
-  width: 350px;
-  text-transform: uppercase;
-}
-
-#cancel-list {
-  @include shadow-box;
-  @include remove-button;
 }
