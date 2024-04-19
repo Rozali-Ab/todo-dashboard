@@ -12,8 +12,8 @@ const setToLocalStorage = (key: string, value: TaskType[] | ListType[]) => {
 };
 
 export const useTasksStore = () => {
-	const tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
-	const lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
+	let tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
+	let lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
 
 	const saveTasks = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.TASKS, tasks);
@@ -23,7 +23,7 @@ export const useTasksStore = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.LISTS, lists);
 	};
 
-	const createTask = ({title}: Record<string, string>) => {
+	const createTask = (title: string) => {
 		const task: TaskType = {
 			id: tasks.length,
 			title: title,
@@ -35,7 +35,7 @@ export const useTasksStore = () => {
 		return task;
 	};
 
-	const createList = ({title}: Record<string, string>) => {
+	const createList = (title: string) => {
 
 		const list: ListType = {
 			id: lists.length,
@@ -56,6 +56,16 @@ export const useTasksStore = () => {
 		}
 	};
 
+	const removeAllTasksByParentId = (parentId: number) => {
+		tasks = tasks.filter(task => task.parentListId !== parentId);
+		saveTasks();
+	};
+
+	const removeListById = (listId: number) => {
+		lists = lists.filter(list => list.id !== listId);
+		saveLists();
+	};
+
 	const updateTaskParentIdById = (taskId: number, parentId: number) => {
 		const updatedTask = tasks.find(task => task.id === taskId);
 
@@ -71,13 +81,22 @@ export const useTasksStore = () => {
 		saveTasks();
 	};
 
+	const updateListTitleByTitle = ({id, title}: ListType) => {
+		const index = lists.findIndex(list => list.id === id);
+		lists[index].title = title;
+		saveLists();
+	};
+
 	return {
 		tasks,
 		lists,
 		createTask,
 		createList,
 		removeTaskById,
+		removeAllTasksByParentId,
+		removeListById,
 		updateTaskParentIdById,
-		updateTaskTitleByTitle
+		updateTaskTitleByTitle,
+		updateListTitleByTitle
 	};
 };

@@ -20,7 +20,18 @@ export const List = ({list, tasks}: ListProps) => {
       <div class="task-list-title">${title}</div>
       <div class="task-list-settings">
         <div class="settigs-menu">
-          <span class="settigs-menu__span">rename</span>
+          <span 
+          	class="settigs-menu__remove"
+          	data-action="remove-list"
+          >
+          	delete list
+          </span>
+          <span 
+          	class="settigs-menu__rename"
+          	data-action="rename-list"
+          >
+          	rename list
+          </span>
         </div>
       </div>
     </div>

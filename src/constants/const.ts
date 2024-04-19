@@ -6,4 +6,6 @@ export const LOCAL_STORAGE_KEYS = {
 export const CLICK_ACTIONS = {
 	EDIT_TASK: 'edit-task',
 	REMOVE_TASK: 'remove-task',
+	RENAME_LIST: 'rename-list',
+	REMOVE_LIST: 'remove-list'
 };

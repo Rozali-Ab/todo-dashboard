@@ -80,7 +80,7 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 			updateTaskTitle(taskPayload);
 			removeForm();
 		} else {
-			const newTask = createTask(getFormData(formNode));
+			const newTask = createTask((getFormData(formNode).title));
 			if (newTask) {
 				renderNewTask(newTask);
 				removeForm();

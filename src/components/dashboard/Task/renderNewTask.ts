@@ -5,14 +5,15 @@ import {renderNewList} from '../List/renderNewList.ts';
 
 const {createList} = useTasksStore();
 
-export const renderNewTask = (task: TaskType) => {
+export const renderNewTask = async (task: TaskType) => {
 	const {parentListId} = task;
 
 	const listElement = document.querySelector(`.task-list[data-id="${parentListId}"]`);
 
 	if (!listElement) {
-		renderNewList(createList({title: 'Task today'}));
-		renderNewTask(task);
+		renderNewList(createList('Task today'));
+		await renderNewTask(task);
+		return;
 	}
 
 	listElement?.insertAdjacentHTML('beforeend', Task(task));

@@ -9,13 +9,13 @@ export const editTask = (evt: MouseEvent) => {
 	if (taskElement && taskTitleElement) {
 		const title = taskTitleElement.textContent;
 		if (title !== null) {
-			const task = {
+			const taskToUpdate = {
 				id: Number(taskElement.dataset.id),
 				title: title,
 				parentListId: Number(taskElement.dataset.parentListId)
 			};
 
-			const {showTaskForm} = useTaskForm(task);
+			const {showTaskForm} = useTaskForm(taskToUpdate);
 			showTaskForm();
 		}
 	}

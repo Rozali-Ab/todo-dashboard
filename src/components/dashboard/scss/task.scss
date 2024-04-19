@@ -9,6 +9,10 @@
   padding: .5rem 1rem;
   transition: transform 0.3s ease-in-out;
 
+  &:hover {
+    cursor: grab;
+  }
+  
   &-type {
     padding: .2rem 1rem;
     background-color: $task-type;
@@ -37,12 +41,12 @@
 
   &-tools {
     @include fd-row;
+    position: absolute;
     padding-right: .1rem;
     justify-content: end;
-    position: absolute;
+    align-items: center;
     right: 0;
     font-size: 1.2rem;
-    color: $app-text-color-extra;
 
     &__remove {
       border-radius: 0;
@@ -62,13 +66,15 @@
     }
 
     &__edit {
-      display: inline-block;
-      margin-right: 1rem;
+      position: relative;
       cursor: text;
       transition: transform 0.3s ease-in-out;
+      background-color: rgba(255, 255, 255, 0);
+      color: $app-text-color-extra;
 
       &:hover {
-        transform: scale(1.5);
+        transform: scale(1.1);
+        color: #fff;
       }
     }
   }
