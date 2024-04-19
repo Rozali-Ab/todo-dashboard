@@ -16,15 +16,15 @@ export const Task = (task: TaskType) => {
 	      data-parent-list-id="${parentListId}"
 	  >
 	      <div class="task-tools">
-        <span 
-          class="task-tools__edit"  
-          id="edit-task"
+        <button 
+          class="task-tools__edit" 
+          data-action="edit-task" 
         > 
           edit
-        </span>
+        </button>
         <button 
           class="task-tools__remove" 
-          id="remove-task"
+          data-action="remove-task"
         ></button>
       </div>
       <div class="task-type">Work</div>

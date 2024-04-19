@@ -3,6 +3,7 @@ import {createModalContainer} from './utils/createModalContainer.ts';
 import {removeModalContainer} from './utils/removeModalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
 import {renderNewTask} from '../dashboard/Task/renderNewTask.ts';
+import {updateTaskTitle} from '../dashboard/Task/editTask.ts';
 import type {TaskType} from '../../store/types/types.ts';
 
 const {createTask} = useTasksStore();
@@ -73,11 +74,17 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 		evt.preventDefault();
 
 		const formNode = evt.target as HTMLFormElement;
-		const newTask = createTask(getFormData(formNode));
 
-		if (newTask) {
-			renderNewTask(newTask);
+		if (taskPayload?.title) {
+			taskPayload.title = getFormData(formNode).title;
+			updateTaskTitle(taskPayload);
 			removeForm();
+		} else {
+			const newTask = createTask(getFormData(formNode));
+			if (newTask) {
+				renderNewTask(newTask);
+				removeForm();
+			}
 		}
 	};
 

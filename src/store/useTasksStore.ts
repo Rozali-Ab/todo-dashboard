@@ -65,12 +65,19 @@ export const useTasksStore = () => {
 		}
 	};
 
+	const updateTaskTitleByTitle = ({id, title}: TaskType) => {
+		const index = tasks.findIndex(task=> task.id === id);
+		tasks[index].title = title;
+		saveTasks();
+	};
+
 	return {
 		tasks,
 		lists,
 		createTask,
 		createList,
 		removeTaskById,
-		updateTaskParentIdById
+		updateTaskParentIdById,
+		updateTaskTitleByTitle
 	};
 };
