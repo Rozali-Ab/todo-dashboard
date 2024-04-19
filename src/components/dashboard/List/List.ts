@@ -18,9 +18,9 @@ export const List = ({list, tasks}: ListProps) => {
 		>
 		<div class="task-list-header">
       <div class="task-list-title">${title}</div>
-      <div class="task-list-settings" id="list settings">
+      <div class="task-list-settings">
         <div class="settigs-menu">
-          <span class="settig-menu__span" id="rename-list">rename</span>
+          <span class="settigs-menu__span">rename</span>
         </div>
       </div>
     </div>

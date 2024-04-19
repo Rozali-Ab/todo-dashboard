@@ -2,7 +2,7 @@ import {useTasksStore} from '../../store/useTasksStore.ts';
 import {createModalContainer} from './utils/createModalContainer.ts';
 import {removeModalContainer} from './utils/removeModalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
-import {renderNewList} from '../dashboard/TaskList/renderNewList.ts';
+import {renderNewList} from '../dashboard/List/renderNewList.ts';
 import type {ListType} from '../../store/types/types.ts';
 
 const {createList} = useTasksStore();
@@ -79,6 +79,7 @@ export const useListForm = (listPayload?: ListType) => {
 
 	return {
 		onSubmitForm,
-		showListForm
+		showListForm,
+		removeForm
 	};
 };
