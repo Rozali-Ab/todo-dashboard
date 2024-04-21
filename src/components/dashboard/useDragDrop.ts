@@ -23,9 +23,8 @@ export const useDragDrop = () => {
 	const onDrop = (evt: DragEvent) => {
 		evt.preventDefault();
 
-		const list = (evt.target as HTMLElement).closest('.task-list');
+		const list = (evt.target as HTMLElement).closest('.task-list') as HTMLDivElement;
 		if (list) {
-			//@ts-ignore
 			const listId = Number(list.dataset.id);
 			const taskId = Number(evt.dataTransfer?.getData('taskId'));
 			const task = document.getElementsByClassName('dragging')[0] as HTMLElement;

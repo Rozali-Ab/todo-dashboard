@@ -1,10 +1,8 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
-import {createModalContainer} from './utils/createModalContainer.ts';
-import {removeModalContainer} from './utils/removeModalContainer.ts';
+import {createModalContainer, removeModalContainer} from './modalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
-import {renderNewList} from '../dashboard/List/renderNewList.ts';
+import {List} from '../dashboard/List/List.ts';
 import type {ListType} from '../../store/types/types.ts';
-import { updateListTitle } from '../dashboard/List/renameList.ts';
 
 const {createList} = useTasksStore();
 
@@ -73,17 +71,16 @@ export const useListForm = (listPayload?: ListType) => {
 
 		const formNode = evt.target as HTMLFormElement;
 
-		if(listPayload?.title) {
+		if (listPayload?.title) {
 			listPayload.title = getFormData(formNode).title;
-
-			updateListTitle(listPayload);
+			List(listPayload).renameListTitle();
 			removeForm();
 		} else {
-				const newList = createList((getFormData(formNode)).title);
-				if (newList) {
-					renderNewList(newList);
-					removeForm();
-				}
+			const newList = createList((getFormData(formNode)).title);
+			if (newList) {
+				List(newList).getList();
+				removeForm();
+			}
 		}
 	};
 

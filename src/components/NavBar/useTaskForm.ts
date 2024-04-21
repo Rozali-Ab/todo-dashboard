@@ -1,9 +1,7 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
-import {createModalContainer} from './utils/createModalContainer.ts';
-import {removeModalContainer} from './utils/removeModalContainer.ts';
+import {createModalContainer, removeModalContainer} from './modalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
-import {renderNewTask} from '../dashboard/Task/renderNewTask.ts';
-import {updateTaskTitle} from '../dashboard/Task/editTask.ts';
+import {Task} from '../dashboard/Task/Task.ts';
 import type {TaskType} from '../../store/types/types.ts';
 
 const {createTask} = useTasksStore();
@@ -77,12 +75,13 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 
 		if (taskPayload?.title) {
 			taskPayload.title = getFormData(formNode).title;
-			updateTaskTitle(taskPayload);
+			Task(taskPayload).renameTaskTitle();
 			removeForm();
 		} else {
 			const newTask = createTask((getFormData(formNode).title));
 			if (newTask) {
-				renderNewTask(newTask);
+				const {renderNewTask} = Task(newTask);
+				renderNewTask();
 				removeForm();
 			}
 		}

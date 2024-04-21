@@ -1,5 +1,5 @@
-import type {ListType, TaskType} from './types/types';
 import {LOCAL_STORAGE_KEYS} from '../constants/const.ts';
+import type {ListType, TaskType} from './types/types';
 
 const getFromLocalStorage = (key: string) => {
 	const data = localStorage.getItem(key);
@@ -44,7 +44,6 @@ export const useTasksStore = () => {
 		};
 		lists.push(list);
 		saveLists();
-
 		return list;
 	};
 
@@ -76,7 +75,7 @@ export const useTasksStore = () => {
 	};
 
 	const updateTaskTitleByTitle = ({id, title}: TaskType) => {
-		const index = tasks.findIndex(task=> task.id === id);
+		const index = tasks.findIndex(task => task.id === id);
 		tasks[index].title = title;
 		saveTasks();
 	};

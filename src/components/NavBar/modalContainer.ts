@@ -5,3 +5,8 @@ export const createModalContainer = (template: string) => {
 	modalContainer.innerHTML = template;
 	document.body.appendChild(modalContainer);
 };
+
+export const removeModalContainer = () => {
+	const modalContainer = document.getElementById('modal');
+	modalContainer?.remove();
+};
