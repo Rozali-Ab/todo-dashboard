@@ -9,11 +9,12 @@ const getListToUpdate = (evt: MouseEvent) => {
 	const listId = Number(listElement.dataset.id);
 	const listTitle = (listElement.querySelector('.task-list-title') as HTMLDivElement).textContent;
 
-	return {
-		id: listId,
-		title: listTitle,
-		order: listId
-	};
+	if (listTitle !== null && listId)
+		return {
+			id: listId,
+			title: listTitle,
+			order: listId
+		};
 };
 const getTaskToUpdate = (evt: MouseEvent) => {
 	const taskElement = (evt.target as HTMLElement).closest('div.task') as HTMLElement;
@@ -21,23 +22,29 @@ const getTaskToUpdate = (evt: MouseEvent) => {
 	const taskParentId = Number(taskElement.dataset.parentListId);
 	const taskTitle = (taskElement.querySelector('.task-title') as HTMLDivElement).textContent;
 
-	return {
-		id: taskId,
-		title: taskTitle,
-		parentListId: taskParentId
-	};
+	if (taskTitle !== null && taskParentId)
+		return {
+			id: taskId,
+			title: taskTitle,
+			parentListId: taskParentId
+		};
 };
 
 export const clickEventDispatcher = (evt: MouseEvent) => {
 	const action = (evt.target as HTMLElement).dataset.action;
+	let elementToRemove;
 
 	switch (action) {
 		case CLICK_ACTIONS.REMOVE_TASK:
-			Task(getTaskToUpdate(evt)).removeTask();
+			elementToRemove = getTaskToUpdate(evt);
+			if (elementToRemove)
+				Task(elementToRemove).removeTask();
 			break;
 
 		case CLICK_ACTIONS.REMOVE_LIST:
-			List(getListToUpdate(evt)).removeList();
+			elementToRemove = getListToUpdate(evt);
+			if (elementToRemove)
+				List(elementToRemove).removeList();
 			break;
 
 		case CLICK_ACTIONS.EDIT_TASK:
