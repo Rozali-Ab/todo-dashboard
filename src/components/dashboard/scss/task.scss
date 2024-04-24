@@ -3,6 +3,7 @@
   @include shadow-box;
   position: relative;
   width: 100%;
+  max-width: 270px;
   min-height: $min-task-height;
   background-color: $task-background-color;
   margin: .5rem 0;

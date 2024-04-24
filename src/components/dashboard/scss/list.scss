@@ -1,7 +1,8 @@
 .task-list {
   @include shadow-box;
   @include fd-column;
-
+  
+  position: relative;
   margin: 0 0 1rem 1rem;
   width: 300px;
   height: min-content;

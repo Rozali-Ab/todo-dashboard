@@ -9,12 +9,11 @@ const getListToUpdate = (evt: MouseEvent) => {
 	const listId = Number(listElement.dataset.id);
 	const listTitle = (listElement.querySelector('.task-list-title') as HTMLDivElement).textContent;
 
-	if (listTitle !== null && listId)
-		return {
-			id: listId,
-			title: listTitle,
-			order: listId
-		};
+	return {
+		id: listId,
+		title: listTitle || 'hi bug',
+		order: listId
+	};
 };
 const getTaskToUpdate = (evt: MouseEvent) => {
 	const taskElement = (evt.target as HTMLElement).closest('div.task') as HTMLElement;
@@ -22,38 +21,30 @@ const getTaskToUpdate = (evt: MouseEvent) => {
 	const taskParentId = Number(taskElement.dataset.parentListId);
 	const taskTitle = (taskElement.querySelector('.task-title') as HTMLDivElement).textContent;
 
-	if (taskTitle !== null && taskParentId)
-		return {
-			id: taskId,
-			title: taskTitle,
-			parentListId: taskParentId
-		};
+	return {
+		id: taskId,
+		title: taskTitle || 'hi bug',
+		parentListId: taskParentId
+	};
 };
 
 export const clickEventDispatcher = (evt: MouseEvent) => {
 	const action = (evt.target as HTMLElement).dataset.action;
-	let elementToRemove;
 
 	switch (action) {
 		case CLICK_ACTIONS.REMOVE_TASK:
-			elementToRemove = getTaskToUpdate(evt);
-			if (elementToRemove)
-				Task(elementToRemove).removeTask();
+			Task(getTaskToUpdate(evt)).removeTask();
 			break;
 
 		case CLICK_ACTIONS.REMOVE_LIST:
-			elementToRemove = getListToUpdate(evt);
-			if (elementToRemove)
-				List(elementToRemove).removeList();
+			List(getListToUpdate(evt)).removeList();
 			break;
 
 		case CLICK_ACTIONS.EDIT_TASK:
 			useTaskForm(getTaskToUpdate(evt)).showTaskForm();
 			break;
-
 		case CLICK_ACTIONS.RENAME_LIST:
 			useListForm(getListToUpdate(evt)).showListForm();
 			break;
-
 	}
 };

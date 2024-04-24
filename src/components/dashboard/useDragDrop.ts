@@ -36,10 +36,45 @@ export const useDragDrop = () => {
 		}
 	};
 
+	const onTouchMove = (evt: TouchEvent) => {
+		evt.preventDefault();
+
+		const task = (evt.target as HTMLElement).closest('.task') as HTMLDivElement;
+		const list = (evt.target as HTMLElement).closest('.task-list') as HTMLDivElement;
+		task.classList.add('dragging');
+		const touch = evt.targetTouches[0];
+
+		task.style.top = touch.pageY - list.offsetTop - (task.offsetHeight / 2) + 'px';
+		task.style.left = touch.pageX - list.offsetLeft - (task.offsetWidth / 2) + 'px';
+
+	};
+
+	const onTouchEnd = (evt: TouchEvent) => {
+		evt.preventDefault();
+		const task = document.querySelector('.dragging') as HTMLDivElement;
+
+		const targetList = document.elementFromPoint(evt.changedTouches[0].clientX, evt.changedTouches[0].clientY) as HTMLElement;
+		const list = targetList.closest('.task-list') as HTMLElement;
+
+		if (list && task) {
+			const taskId = Number(task.dataset.id);
+			const listId = Number(list.dataset.id);
+			list.appendChild(task);
+			task?.classList.remove('dragging');
+			task.dataset.parentListId = listId.toString();
+			task.style.top = '';
+			task.style.left = '';
+			updateTaskParentIdById(taskId, listId);
+		}
+
+	};
+
 	return {
 		onDragStart,
 		onDragEnter,
 		onDragOver,
 		onDrop,
+		onTouchMove,
+		onTouchEnd
 	};
 };
