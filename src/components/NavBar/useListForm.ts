@@ -72,16 +72,22 @@ export const useListForm = (listPayload?: ListType) => {
 		const formNode = evt.target as HTMLFormElement;
 
 		if (listPayload?.title) {
+
 			listPayload.title = getFormData(formNode).title;
 			List(listPayload).renameListTitle();
 			removeForm();
-		} else {
-			const newList = createList((getFormData(formNode)).title);
-			if (newList) {
+			return;
+		}
+
+		const newList = createList((getFormData(formNode)).title);
+
+		if (newList) {
+
 				List(newList).renderList();
 				removeForm();
-			}
+
 		}
+		
 	};
 
 	return {

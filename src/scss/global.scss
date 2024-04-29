@@ -1,6 +1,10 @@
 @import './variables.scss';
 @import './mixins.scss';
 
+:root {
+  --current-drag-task-height: 100px ;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -22,6 +22,10 @@ if (dashboard) {
 	dashboard.addEventListener('touchend', (evt: TouchEvent) => onTouchEnd(evt));
 
 	dashboard.addEventListener('click', (evt: MouseEvent) => clickEventDispatcher(evt));
+
+	// dashboard.addEventListener('removecheto', (id) =>store);
+
+	// dashboard.addEventListener('onEditColumn', (id) => store) взять из стора найти по id и запихать в форму
 	// TODO сделать свои евенты и подписаться на них
 	// https://learn.javascript.ru/dispatch-events
 }

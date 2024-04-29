@@ -7,6 +7,8 @@
   width: 300px;
   height: min-content;
 
+  TODO //min-height: calc( var(--current-drag-task-height));
+
   &-header {
     position: relative;
     display: flex;
