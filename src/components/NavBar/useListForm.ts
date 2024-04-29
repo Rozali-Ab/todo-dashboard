@@ -78,7 +78,7 @@ export const useListForm = (listPayload?: ListType) => {
 		} else {
 			const newList = createList((getFormData(formNode)).title);
 			if (newList) {
-				List(newList).getList();
+				List(newList).renderList();
 				removeForm();
 			}
 		}

@@ -11,10 +11,10 @@ const setToLocalStorage = (key: string, value: TaskType[] | ListType[]) => {
 	localStorage.setItem(key, JSON.stringify(value));
 };
 
-export const useTasksStore = () => {
-	let tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
-	let lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
+let tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
+let lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
 
+export const useTasksStore = () => {
 	const saveTasks = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.TASKS, tasks);
 	};
@@ -37,11 +37,17 @@ export const useTasksStore = () => {
 
 	const createList = (title: string) => {
 
+		if (lists.length>= 5) {
+			alert('ti sho epta');
+			return;
+		}
+
 		const list: ListType = {
 			id: lists.length,
-			title: title,
+			title,
 			order: lists.length
 		};
+
 		lists.push(list);
 		saveLists();
 		return list;
@@ -58,6 +64,13 @@ export const useTasksStore = () => {
 	const removeAllTasksByParentId = (parentId: number) => {
 		tasks = tasks.filter(task => task.parentListId !== parentId);
 		saveTasks();
+	};
+
+	const findListById = (listId: number) => {
+		if (listId) {
+			return  lists.find(list => list.id === listId);
+		}
+		
 	};
 
 	const removeListById = (listId: number) => {
@@ -80,15 +93,22 @@ export const useTasksStore = () => {
 		saveTasks();
 	};
 
-	const updateListTitleByTitle = ({id, title}: ListType) => {
+	const updateListById = (payload: ListType) => {
+
+		const {id} = payload;
 		const index = lists.findIndex(list => list.id === id);
-		lists[index].title = title;
+
+		if (index >= 0 ) {
+			lists[index]  = payload;
+		}
+
 		saveLists();
 	};
 
 	return {
 		tasks,
 		lists,
+		findListById,
 		createTask,
 		createList,
 		removeTaskById,
@@ -96,6 +116,6 @@ export const useTasksStore = () => {
 		removeListById,
 		updateTaskParentIdById,
 		updateTaskTitleByTitle,
-		updateListTitleByTitle
+		updateListById
 	};
 };

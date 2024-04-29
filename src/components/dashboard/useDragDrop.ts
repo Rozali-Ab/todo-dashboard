@@ -53,8 +53,8 @@ export const useDragDrop = () => {
 		evt.preventDefault();
 		const task = document.querySelector('.dragging') as HTMLDivElement;
 
-		const targetList = document.elementFromPoint(evt.changedTouches[0].clientX, evt.changedTouches[0].clientY) as HTMLElement;
-		const list = targetList.closest('.task-list') as HTMLElement;
+		const tarrenderList = document.elementFromPoint(evt.changedTouches[0].clientX, evt.changedTouches[0].clientY) as HTMLElement;
+		const list = tarrenderList.closest('.task-list') as HTMLElement;
 
 		if (list && task) {
 			const taskId = Number(task.dataset.id);

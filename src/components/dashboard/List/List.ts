@@ -1,7 +1,7 @@
 import {useTasksStore} from '../../../store/useTasksStore.ts';
 import {Task} from '../Task/Task.ts';
 import type {ListType, TaskType} from '../../../store/types/types.ts';
-
+const dashboard = document.getElementById('dashboard');
 const template = (list: ListType, tasks?: TaskType[]) => {
 	const {id, title} = list;
 	const taskElements = tasks?.map(task => Task(task).getTaskTemplate()).join('') || '';
@@ -16,18 +16,18 @@ const template = (list: ListType, tasks?: TaskType[]) => {
       <div class="task-list-title">${title}</div>
       <div class="task-list-settings ${isHide}">
         <div class="settigs-menu">
-          <span 
+          <button 
           	class="settigs-menu__remove"
           	data-action="remove-list"
           >
           	delete list
-          </span>
-          <span 
+          </button>
+          <button 
           	class="settigs-menu__rename"
           	data-action="rename-list"
           >
           	rename list
-          </span>
+          </button>
         </div>
       </div>
     </div>
@@ -37,24 +37,33 @@ const template = (list: ListType, tasks?: TaskType[]) => {
 };
 
 export const List = (list: ListType, tasks?: TaskType[]) => {
-	const {removeListById, removeAllTasksByParentId, updateListTitleByTitle} = useTasksStore();
-	const container = document.getElementById('dashboard');
 
+// TODO class
+
+	const {removeListById, removeAllTasksByParentId, updateListById} = useTasksStore();
+	
 	const listElement = document.querySelector(`.task-list[data-id="${list.id}"]`);
+
 	const titleElement = listElement?.querySelector('.task-list-title');
 
-	const getList = () => {
-		if (container) container.insertAdjacentHTML('beforeend', template(list, tasks));
+	const renderList = () => {
+		if (dashboard) {
+			dashboard.insertAdjacentHTML('beforeend', template(list, tasks));
+		}
 	};
 
 	const renameListTitle = () => {
 		if (titleElement)
+		{
 			titleElement.textContent = list.title;
-		updateListTitleByTitle(list);
+			updateListById(list);
+		}
 	};
 
 	const removeList = () => {
+
 		const isEmpty = listElement?.getElementsByClassName('task').length === 0;
+
 		if (isEmpty) {
 			listElement.remove();
 			removeListById(list.id);
@@ -70,7 +79,7 @@ export const List = (list: ListType, tasks?: TaskType[]) => {
 	};
 
 	return {
-		getList,
+		renderList,
 		renameListTitle,
 		removeList,
 	};
