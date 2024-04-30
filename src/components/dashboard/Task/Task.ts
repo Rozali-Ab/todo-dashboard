@@ -51,12 +51,16 @@ export const Task = (task: TaskType) => {
 
 	const renderNewTask = () => {
 		const taskParentElement = document.querySelector('.task-list[data-id="0"]');
+
 		if (!taskParentElement) {
 			const list = createList('Task today');
-			List(list).getList();
+			List(list).renderList();
+
 			renderNewTask();
 			return;
-		} else taskParentElement.insertAdjacentHTML('beforeend', getTaskTemplate());
+		} 
+		
+		taskParentElement.insertAdjacentHTML('beforeend', getTaskTemplate());
 	};
 
 	const renameTaskTitle = () => {

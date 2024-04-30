@@ -10,7 +10,7 @@ const dashboard = document.querySelector<HTMLElement>('#dashboard');
 if (dashboard) {
 	lists.forEach((list) => {
 		const tasksInList = tasks.filter((task) => task.parentListId === list.id);
-		List(list, tasksInList).getList();
+		List(list, tasksInList).renderList();
 	});
 
 	dashboard.addEventListener('dragover', (evt: DragEvent) => onDragOver(evt));
