@@ -1,7 +1,7 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
-import {createModalContainer, removeModalContainer} from './modalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
 import {List} from '../dashboard/List/List.ts';
+import {modal} from './index.ts';
 import type {ListType} from '../../store/types/types.ts';
 
 const {createList} = useTasksStore();
@@ -54,7 +54,8 @@ export const useListForm = (listPayload?: ListType) => {
 
 	const showListForm = () => {
 		const listToUse = listPayload || emptyList;
-		createModalContainer(formTemplate(listToUse));
+		modal.innerHTML = formTemplate(listToUse);
+		modal.showModal();
 
 		const form = document.getElementById('form-new-list');
 		form?.addEventListener('submit', (evt) => onSubmitForm(evt));
@@ -63,7 +64,8 @@ export const useListForm = (listPayload?: ListType) => {
 	};
 
 	const removeForm = () => {
-		removeModalContainer();
+		modal.innerHTML = '';
+		modal.close();
 	};
 
 	const onSubmitForm = (evt: SubmitEvent) => {
@@ -79,7 +81,7 @@ export const useListForm = (listPayload?: ListType) => {
 		}
 
 		const newList = createList((getFormData(formNode)).title);
-		
+
 		if (newList) {
 			List(newList).renderList();
 			removeForm();

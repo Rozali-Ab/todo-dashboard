@@ -40,7 +40,7 @@ const template = (task: TaskType) => {
 };
 
 export const Task = (task: TaskType) => {
-	const {removeTaskById, updateTaskParentIdById, updateTaskTitleByTitle, createList} = useTasksStore();
+	const {removeTaskById, updateTaskParentIdById, updateTaskTitle, createList} = useTasksStore();
 
 	const taskElement = document.querySelector(`.task[data-id="${task.id}"]`) as HTMLDivElement;
 	const titleElement = taskElement?.querySelector('.task-title');
@@ -54,19 +54,17 @@ export const Task = (task: TaskType) => {
 
 		if (!taskParentElement) {
 			const list = createList('Task today');
-			List(list).renderList();
-
-			renderNewTask();
+			List(list, [task]).renderList();
 			return;
-		} 
-		
+		}
+
 		taskParentElement.insertAdjacentHTML('beforeend', getTaskTemplate());
 	};
 
 	const renameTaskTitle = () => {
 		if (titleElement)
 			titleElement.textContent = task.title;
-		updateTaskTitleByTitle(task);
+		updateTaskTitle(task);
 	};
 
 	const updateParentId = (parentId: number) => {

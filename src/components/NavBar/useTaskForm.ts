@@ -1,7 +1,7 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
-import {createModalContainer, removeModalContainer} from './modalContainer.ts';
 import {getFormData} from './utils/getFormData.ts';
 import {Task} from '../dashboard/Task/Task.ts';
+import {modal} from './index.ts';
 import type {TaskType} from '../../store/types/types.ts';
 
 const {createTask} = useTasksStore();
@@ -56,7 +56,9 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 
 	const showTaskForm = () => {
 		const taskToUse = taskPayload || emptyTask;
-		createModalContainer(formTemplate(taskToUse));
+
+		modal.innerHTML = formTemplate(taskToUse);
+		modal.showModal();
 
 		const form = document.getElementById('form-new-task');
 		form?.addEventListener('submit', (evt) => onSubmitForm(evt));
@@ -65,7 +67,8 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 	};
 
 	const removeForm = () => {
-		removeModalContainer();
+		modal.close();
+		modal.innerHTML = '';
 	};
 
 	const onSubmitForm = (evt: SubmitEvent) => {
@@ -77,13 +80,12 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 			taskPayload.title = getFormData(formNode).title;
 			Task(taskPayload).renameTaskTitle();
 			removeForm();
-		} else {
-			const newTask = createTask((getFormData(formNode).title));
-			if (newTask) {
-				const {renderNewTask} = Task(newTask);
-				renderNewTask();
-				removeForm();
-			}
+			return;
+		}
+		const newTask = createTask((getFormData(formNode).title));
+		if (newTask) {
+			Task(newTask).renderNewTask();
+			removeForm();
 		}
 	};
 

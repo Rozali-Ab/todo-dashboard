@@ -75,9 +75,10 @@ export const useTasksStore = () => {
 		}
 	};
 
-	const updateTaskTitleByTitle = ({id, title}: TaskType) => {
+	const updateTaskTitle = (payload: TaskType) => {
+		const {id} = payload;
 		const index = tasks.findIndex(task => task.id === id);
-		tasks[index].title = title;
+		tasks[index] = payload;
 		saveTasks();
 	};
 
@@ -106,7 +107,7 @@ export const useTasksStore = () => {
 		removeAllTasksByParentId,
 		removeListById,
 		updateTaskParentIdById,
-		updateTaskTitleByTitle,
+		updateTaskTitle,
 		updateListById,
 		findListById
 	};
