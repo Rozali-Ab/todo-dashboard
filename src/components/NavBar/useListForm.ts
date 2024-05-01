@@ -1,10 +1,9 @@
-import {useTasksStore} from '../../store/useTasksStore.ts';
-import {getFormData} from './utils/getFormData.ts';
-import {List} from '../dashboard/List/List.ts';
+//import {useTasksStore} from '../../store/useTasksStore.ts';
+//import {List} from '../dashboard/List/List.ts';
 import {modal} from './index.ts';
 import type {ListType} from '../../store/types/types.ts';
 
-const {createList} = useTasksStore();
+//const {createList} = useTasksStore();
 
 const formTemplate = ({title}: ListType) => {
 	const isNew = title === '' ? 'New' : '';
@@ -56,9 +55,9 @@ export const useListForm = (listPayload?: ListType) => {
 		const listToUse = listPayload || emptyList;
 		modal.innerHTML = formTemplate(listToUse);
 		modal.showModal();
-
-		const form = document.getElementById('form-new-list');
-		form?.addEventListener('submit', (evt) => onSubmitForm(evt));
+		/*
+				const form = document.getElementById('form-new-list');
+				form?.addEventListener('submit', (evt) => onSubmitForm(evt));*/
 		const cancelButton = document.getElementById('cancel-list');
 		cancelButton?.addEventListener('click', removeForm);
 	};
@@ -68,7 +67,7 @@ export const useListForm = (listPayload?: ListType) => {
 		modal.close();
 	};
 
-	const onSubmitForm = (evt: SubmitEvent) => {
+	/*const onSubmitForm = (evt: SubmitEvent) => {
 		evt.preventDefault();
 
 		const formNode = evt.target as HTMLFormElement;
@@ -86,11 +85,11 @@ export const useListForm = (listPayload?: ListType) => {
 			List(newList).renderList();
 			removeForm();
 		}
-	};
+	};*/
 
 	return {
-		onSubmitForm,
+		//onSubmitForm,
 		showListForm,
-		removeForm
+		//removeForm
 	};
 };

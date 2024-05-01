@@ -1,10 +1,12 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
+import Task from './Task/Task.ts';
+import List from './List/List.ts';
 
 export const useDragDrop = () => {
 	const {updateTaskParentIdById} = useTasksStore();
 
 	const onDragStart = (evt: DragEvent) => {
-		const taskId = (evt.target as HTMLElement).dataset.id;
+		const taskId = (evt.target as Task).id;
 		(evt.target as HTMLElement).classList.add('dragging');
 		if (taskId) {
 			evt.dataTransfer?.setData('taskId', taskId);
@@ -23,15 +25,18 @@ export const useDragDrop = () => {
 	const onDrop = (evt: DragEvent) => {
 		evt.preventDefault();
 
-		const list = (evt.target as HTMLElement).closest('.task-list') as HTMLDivElement;
+		const list = (evt.target as HTMLElement).closest('task-list') as List;
 		if (list) {
-			const listId = Number(list.dataset.id);
+
+			const listId = Number(list.id);
 			const taskId = Number(evt.dataTransfer?.getData('taskId'));
-			const task = document.getElementsByClassName('dragging')[0] as HTMLElement;
+			const task = document.getElementsByClassName('dragging')[0] as Task;
 
 			updateTaskParentIdById(taskId, listId);
+
+			task.setAttribute('parent', listId.toString());
+
 			list.appendChild(task);
-			task.dataset.parentListId = listId.toString();
 			task.classList.remove('dragging');
 		}
 	};
