@@ -3,6 +3,7 @@ import List from './List/List';
 import Task from './Task/Task';
 import {useListForm} from '../NavBar/useListForm';
 import {useTaskForm} from '../NavBar/useTaskForm';
+import {TaskToolsEvent} from '../../constants/TaskToolsEvent.ts';
 
 customElements.define('task-list', List);
 customElements.define('task-component', Task);
@@ -10,8 +11,11 @@ customElements.define('task-component', Task);
 const {onDragStart, onDragEnter, onDragOver, onDrop, onTouchMove, onTouchEnd} = useDragDrop();
 const dashboard = document.querySelector<HTMLElement>('#dashboard');
 
+const domTasksMap = new Map();
+
 const tasks = [
-	{id: 0, title: 'Task 1', parentListId: 0},
+
+	{id: 120, title: 'Task 1', parentListId: 0},
 	{id: 1, title: 'Task 2', parentListId: 0},
 	{id: 2, title: 'Task 3', parentListId: 0},
 	{id: 3, title: 'Task 4', parentListId: 1},
@@ -20,33 +24,51 @@ const tasks = [
 	{id: 6, title: 'Task 7', parentListId: 2},
 	{id: 7, title: 'Task 8', parentListId: 2},
 	{id: 8, title: 'Task 9', parentListId: 2}
+
 ];
+
 const lists = [
+
 	{id: 0, title: 'Task today', order: 0},
 	{id: 1, title: 'Tomorrow', order: 1},
 	{id: 2, title: 'Then', order: 2}
+
 ];
 
 if (dashboard) {
 
 	const createComponents = () => {
+
+		// TODO  reduce
+
 		lists.forEach((list) => {
 			const listComponent = new List();
+
 			listComponent.setAttribute('id', list.id.toString());
 			listComponent.setAttribute('title', list.title.toString());
 
 			const taskInList = tasks.filter((task) => task.parentListId === list.id);
+
 			taskInList.forEach((task) => {
-				const taskComponent = new Task();
+				const {id} = task;
+				const taskComponent = new Task(task);
+
 				taskComponent.setAttribute('slot', 'task');
 				taskComponent.setAttribute('id', task.id.toString());
 				taskComponent.setAttribute('title', task.title);
 				taskComponent.setAttribute('parent', task.parentListId.toString());
 
+				domTasksMap.set(id, taskComponent);
+
 				listComponent.appendChild(taskComponent);
+				const a = document.createElement('p');
+				a.innerHTML = '<button>avc</button>';
+				listComponent.appendChild(a);
 			});
+
 			dashboard.appendChild(listComponent);
 		});
+
 	};
 
 	createComponents();
@@ -61,14 +83,21 @@ if (dashboard) {
 		const currenList = lists.find(list => list.id === listId);
 		console.log(currenList);
 		useListForm(currenList).showListForm();
+
 	});
 
-	dashboard.addEventListener('edit-task', (evt) => {
+	dashboard.addEventListener(TaskToolsEvent.EDIT_TASK, (evt) => {
 
-		const taskId = Number((evt.target as Task).id);
-		const currentTask = tasks.find(task => task.id === taskId);
-		console.log(currentTask);
-		useTaskForm(currentTask).showTaskForm();
+		const { detail } = evt;
+
+		const taskId = detail?.id ||  (evt.target as Task).id;
+
+		const currentTask = tasks.find(task => task.id === Number(taskId));
+
+		domTasksMap.get(120).updateData({hui:true});
+
+		 useTaskForm(currentTask).showTaskForm();
+
 	});
 
 	dashboard.addEventListener('add-task', (evt) => {

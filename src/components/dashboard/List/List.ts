@@ -49,6 +49,7 @@ template.innerHTML = `
         </div>
       </div>
     </div>
+    
     <slot name="task"></slot>
 	</div>
 `;
@@ -57,9 +58,9 @@ export default class List extends HTMLElement {
 	id = '';
 	title = '';
 
-	constructor() {
+	constructor(payload) {
 		super();
-
+		this.taskArray = [];
 		const shadow = this.attachShadow({mode: 'open'});
 		shadow.append(template.content.cloneNode(true));
 	}

@@ -1,81 +1,20 @@
 import {editTaskEvent, removeTaskEvent} from '../../../events/events';
-
-const template = document.createElement('template');
-template.innerHTML = `
-	<style>
-		.task {
-			position: relative;
-			display: flex;
-			flex-direction: column;
-		  margin: .5rem 0;
-		  padding: .5rem 1rem;
-			background-color: rgba(255,255,255,0.4);
-	    border-radius: 1.5rem;
-		}
-		.task-title {
-			margin-top: .5rem;
-	    font-size: 2rem;
-	    word-break: break-all;
-		}
-		.task-tools {
-			flex-direction: row;
-	    position: absolute;
-	    padding-right: 1rem;
-	    justify-content: end;
-	    align-items: center;
-	    right: 0;
-	    font-size: 1.2rem;
-		}
-		.task-tools__edit {
-      cursor: text;
-      transition: transform 0.3s ease-in-out;
-      background-color: rgba(255, 255, 255, 0);
-      color: rgba(9, 9, 9, 0.4);
-		}
-		.task-tools__remove {
-      border-radius: 0;
-      width: 10px;
-      height: 15px;
-      background-color: rgba(255, 255, 255, 0);
-      background-image: url('/src/assets/svg/trash.svg');
-      background-repeat: no-repeat;
-      filter: sepia(70%);
-		}
-		button {
-		border: none;
-		}
-		
-	</style>
-	  <div
-	      class="task"
-	      draggable="true"
-	  >
-	      <div class="task-tools">
-	        <button 
-	          class="task-tools__edit" 
-	          data-action="edit-task" 
-	        > 
-	          edit
-	        </button>
-	        <button 
-	          class="task-tools__remove" 
-	          data-action="remove-task"
-	        ></button>
-      </div>
-      <div class="task-title"></div>
-    </div>  
-`;
+import {TaskType} from '../../../store/types/types.ts';
+import {TaskToolsEvent} from '../../../constants/TaskToolsEvent.ts';
 
 export default class Task extends HTMLElement {
 	id = '';
 	title = '';
 	parent = '';
+	taskTools = document.createElement('div');
 
-	constructor() {
+	constructor(payload ? : TaskType ) {
+
 		super();
+		this.setTaskAttributes(payload);
 
-		const shadow = this.attachShadow({mode: 'open'});
-		shadow.append(template.content.cloneNode(true));
+		// this.innerHTML = template;
+
 	}
 
 	onRemoveClick() {
@@ -90,29 +29,76 @@ export default class Task extends HTMLElement {
 	connectedCallback() {
 		//mounted
 
-		this.id = this.getAttribute('id');
-		this.title = this.getAttribute('title');
-		this.parent = this.getAttribute('parent');
-
-		this.shadowRoot.querySelector('.task-title').textContent = this.title;
-
-		this.shadowRoot.querySelector('[data-action="remove-task"]').addEventListener('click', this.onRemoveClick.bind(this));
-		this.shadowRoot.querySelector('[data-action="edit-task"]').addEventListener('click', this.onEditClick.bind(this));
+		this.buildTemplate();
+		this.taskTools.addEventListener( 'click', this.onTaskToolsClick );
+		//
+		// this.shadowRoot.querySelector('.task-title').textContent = this.title;
+		//
+		// this.shadowRoot.querySelector('[data-action="remove-task"]').addEventListener('click', this.onRemoveClick.bind(this));
+		// this.shadowRoot.querySelector('[data-action="edit-task"]').addEventListener('click', this.onEditClick.bind(this));
 
 	}
 
 	disconnectedCallback() {
 		// "Unmount"
-		this.shadowRoot.querySelector('[data-action="remove-task"]').removeEventListener('click', this.onRemoveClick.bind(this));
-		this.shadowRoot.querySelector('[data-action="edit-task"]').removeEventListener('click', this.onEditClick.bind(this));
+		// this.shadowRoot.querySelector('[data-action="remove-task"]').removeEventListener('click', this.onRemoveClick.bind(this));
+		// this.shadowRoot.querySelector('[data-action-type="edit-task"]').removeEventListener('click', this.onEditClick.bind(this));
 	}
 
 	static get observedAttributes() {
 		return ['title', 'parent'];
 	}
 
-	// attributeChangedCallback(attribute, previousValue, currentValue) {
-	// }
+	attributeChangedCallback(attribute, previousValue, currentValue) {
+
+	}
+
+	onTaskToolsClick = (e) => {
+
+		const currentAction = e.target.dataset.actionType;
+		// задание со зведочкой починить this без стрелочной фнукции потеря контекста
+		
+		// сделать првоерку есть ли евент такой
+		const {id} = this;
+
+		const event = 	new CustomEvent(currentAction, {
+			bubbles: true,
+			detail: { id }
+		});
+
+		this.dispatchEvent(event);
+	};
+
+	buildTemplate  (){
+
+		this.setTaskAttributes();
+		this.classList.add('task');
+		this.setAttribute('draggable', 'true');
+
+		this.taskTools.innerHTML = ` <button   class="task-tools__edit"   data-action-type="${TaskToolsEvent.EDIT_TASK}">   edit </button> <button class="task-tools__remove" data-action-type="${TaskToolsEvent.REMOVE_TASK}">кай унтан </button>`;
+		this.prepend(this.taskTools);
+
+		const taskBody = document.createElement('div');
+		taskBody.innerHTML = `<div class="task-title"> ${this.title} id ${this.id} </div>`;
+		this.append(taskBody);
+
+	}
+
+	setTaskAttributes(payload = {}) {
+
+		const {id} = payload;
+		// проверять число ли id
+		this.id = id ? id : this.getAttribute('id');
+
+		this.title = this.getAttribute('title');
+		this.parent = this.getAttribute('parent');
+
+	}
+
+	updateData (payload = {}) {
+
+		console.log('updateData!');
+	}
 }
 
 /*import {useTasksStore} from '../../../store/useTasksStore.ts';
