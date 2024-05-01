@@ -14,11 +14,18 @@ export const useDragDrop = () => {
 	};
 
 	const onDragEnter = (evt: DragEvent) => {
+// TODO почитать что такое  instanceof ;
+		if ( evt.target instanceof Task ) {
+			// или провверять по тегу
+
+			console.log('true!!');
+		}
 		evt.preventDefault();
 
 	};
 
 	const onDragOver = (evt: DragEvent) => {
+
 		evt.preventDefault();
 	};
 
