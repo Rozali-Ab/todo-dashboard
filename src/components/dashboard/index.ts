@@ -1,21 +1,23 @@
-import {useDragDrop} from './useDragDrop';
 import List from './List/List';
 import Task from './Task/Task';
-import {useListForm} from '../NavBar/useListForm';
-import {useTaskForm} from '../NavBar/useTaskForm';
+import {useDragDrop} from './useDragDrop';
+import {useTaskForm} from '../NavBar/useTaskForm.ts';
+import {useListForm} from '../NavBar/useListForm.ts';
 import {TaskToolsEvent} from '../../constants/TaskToolsEvent.ts';
+import {ListToolsEvents} from '../../constants/ListToolsEvents.ts';
+import type {TaskType} from '../../store/types/types.ts';
 
 customElements.define('task-list', List);
 customElements.define('task-component', Task);
 
-const {onDragStart, onDragEnter, onDragOver, onDrop, onTouchMove, onTouchEnd} = useDragDrop();
+const {onDragStart, onDragLeave, onDragEnter, onDragOver, onDragEnd, onDrop, onTouchMove, onTouchEnd} = useDragDrop();
 const dashboard = document.querySelector<HTMLElement>('#dashboard');
 
-const domTasksMap = new Map();
+const domListsMap = new Map();
 
 const tasks = [
 
-	{id: 120, title: 'Task 1', parentListId: 0},
+	{id: 0, title: 'Task 1', parentListId: 0},
 	{id: 1, title: 'Task 2', parentListId: 0},
 	{id: 2, title: 'Task 3', parentListId: 0},
 	{id: 3, title: 'Task 4', parentListId: 1},
@@ -35,112 +37,101 @@ const lists = [
 
 ];
 
+const groupedTasksByParent = tasks.reduce((acc, task) => {
+	const {parentListId} = task;
+
+	if (!acc.has(parentListId)) {
+		acc.set(parentListId, []);
+	}
+	acc.get(parentListId).push(task);
+	return acc;
+}, new Map());
+
 if (dashboard) {
 
 	const createComponents = () => {
 
-		// TODO  reduce
-
 		lists.forEach((list) => {
-			const listComponent = new List();
+			const {id} = list;
+			const taskInList: TaskType | TaskType[] = groupedTasksByParent.get(id);
 
-			listComponent.setAttribute('id', list.id.toString());
-			listComponent.setAttribute('title', list.title.toString());
+			const listComponent = taskInList ? new List({list, tasks: taskInList}) : new List({list});
 
-			const taskInList = tasks.filter((task) => task.parentListId === list.id);
-
-			taskInList.forEach((task) => {
-				const {id} = task;
-				const taskComponent = new Task(task);
-
-				taskComponent.setAttribute('slot', 'task');
-				taskComponent.setAttribute('id', task.id.toString());
-				taskComponent.setAttribute('title', task.title);
-				taskComponent.setAttribute('parent', task.parentListId.toString());
-
-				domTasksMap.set(id, taskComponent);
-
-				listComponent.appendChild(taskComponent);
-				const a = document.createElement('p');
-				a.innerHTML = '<button>avc</button>';
-				listComponent.appendChild(a);
-			});
-
+			domListsMap.set(id, listComponent);
 			dashboard.appendChild(listComponent);
-		});
 
+		});
 	};
 
 	createComponents();
 
-	dashboard.addEventListener('remove-list', (evt) => {
-		console.log('remove-list custom event id: ', (evt.target as List).id);
+	dashboard.addEventListener(ListToolsEvents.REMOVE_LIST, (evt) => {
+
+		const {detail} = evt as CustomEvent;
+
+		const listId = Number(detail.id || (evt.target as List).id);
+
+		const listComponent = domListsMap.get(listId);
+		listComponent.addEventListener('transitionend', () => listComponent.remove());
+		listComponent.style.opacity = 0;
+
 	});
 
-	dashboard.addEventListener('edit-list', (evt) => {
+	dashboard.addEventListener(ListToolsEvents.EDIT_LIST, (evt) => {
 
 		const listId = Number((evt.target as List).id);
 		const currenList = lists.find(list => list.id === listId);
-		console.log(currenList);
+
+		domListsMap.get(listId).setAttribute('title', 'Edit');
 		useListForm(currenList).showListForm();
 
 	});
 
-	dashboard.addEventListener(TaskToolsEvent.EDIT_TASK, (evt) => {
-
-		const { detail } = evt;
-
-		const taskId = detail?.id ||  (evt.target as Task).id;
-
-		const currentTask = tasks.find(task => task.id === Number(taskId));
-
-		domTasksMap.get(120).updateData({hui:true});
-
-		 useTaskForm(currentTask).showTaskForm();
-
-	});
-
-	dashboard.addEventListener('add-task', (evt) => {
+	dashboard.addEventListener(ListToolsEvents.ADD_TASK, (evt) => {
 		//получаем id листа, в котором добавить таску
 		console.log('add-task custom event id: ', (evt.target as List).id);
 	});
 
-	dashboard.addEventListener('remove-task', (evt) => {
-		console.log('remove-task custom event id: ', (evt.target as Task).id);
+	dashboard.addEventListener(TaskToolsEvent.EDIT_TASK, (evt) => {
+
+		const {detail} = evt as CustomEvent;
+
+		const taskId = Number(detail.id || (evt.target as Task).id);
+
+		(evt.target as Task).setAttribute('title', 'edited');
+
+		const currentTask = tasks.find(task => task.id === Number(taskId));
+
+		useTaskForm(currentTask).showTaskForm();
+
 	});
 
+	dashboard.addEventListener(TaskToolsEvent.REMOVE_TASK, (evt) => {
+
+		const {detail} = evt as CustomEvent;
+
+		const taskId = Number(detail.id || (evt.target as Task).id);
+		const listId = Number((evt.target as Task).parent);
+
+		if (listId !== undefined) {
+
+			const listComponent = domListsMap.get(listId);
+
+			const taskComponent = listComponent.querySelector(`task-component[id="${taskId}"]`);
+			taskComponent.addEventListener('transitionend', () => taskComponent.remove());
+			taskComponent.style.opacity = 0;
+
+		}
+	});
+
+	dashboard.addEventListener('dragleave', (evt: DragEvent) => onDragLeave(evt));
 	dashboard.addEventListener('dragover', (evt: DragEvent) => onDragOver(evt));
 	dashboard.addEventListener('dragenter', (evt: DragEvent) => onDragEnter(evt));
 	dashboard.addEventListener('dragstart', (evt: DragEvent) => onDragStart(evt));
+	dashboard.addEventListener('dragend', (evt: DragEvent) => onDragEnd(evt));
 	dashboard.addEventListener('drop', (evt: DragEvent) => onDrop(evt));
 
 	dashboard.addEventListener('touchmove', (evt: TouchEvent) => onTouchMove(evt));
 	dashboard.addEventListener('touchend', (evt: TouchEvent) => onTouchEnd(evt));
 
 }
-
-/*import {useTasksStore} from '../../store/useTasksStore.ts';
-import {useDragDrop} from './useDragDrop.ts';
-import {clickEventDispatcher} from './clickEventDispatcher.ts';
-import {List} from './List/List.ts';
-
-const {onDragStart, onDragEnter, onDragOver, onDrop, onTouchMove, onTouchEnd} = useDragDrop();
-const {lists, tasks} = useTasksStore();
-const dashboard = document.querySelector<HTMLElement>('#dashboard');
-
-if (dashboard) {
-	lists.forEach((list) => {
-		const tasksInList = tasks.filter((task) => task.parentListId === list.id);
-		List(list, tasksInList).renderList();
-	});
-
-	dashboard.addEventListener('dragover', (evt: DragEvent) => onDragOver(evt));
-	dashboard.addEventListener('dragenter', (evt: DragEvent) => onDragEnter(evt));
-	dashboard.addEventListener('dragstart', (evt: DragEvent) => onDragStart(evt));
-	dashboard.addEventListener('drop', (evt: DragEvent) => onDrop(evt));
-
-	dashboard.addEventListener('touchmove', (evt: TouchEvent) => onTouchMove(evt));
-	dashboard.addEventListener('touchend', (evt: TouchEvent) => onTouchEnd(evt));
-
-	dashboard.addEventListener('click', (evt: MouseEvent) => clickEventDispatcher(evt));
-}*/
