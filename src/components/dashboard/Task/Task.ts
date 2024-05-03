@@ -1,5 +1,5 @@
 import {TaskType} from '../../../store/types/types.ts';
-import {TaskToolsEvent} from '../../../constants/TaskToolsEvent.ts';
+import {TASK_TOOLS_EVENTS} from '../../../constants/dashboardEvents.ts';
 
 export default class Task extends HTMLElement {
 	id = '';
@@ -55,8 +55,8 @@ export default class Task extends HTMLElement {
 		this.taskTools.classList.add('task-tools');
 
 		this.taskTools.innerHTML = `
-			<button class="task-tools__edit" data-action-type="${TaskToolsEvent.EDIT_TASK}">edit</button>
-			<button class="task-tools__remove" data-action-type="${TaskToolsEvent.REMOVE_TASK}"></button>
+			<button class="task-tools__edit" data-action-type="${TASK_TOOLS_EVENTS.EDIT_TASK}">edit</button>
+			<button class="task-tools__remove" data-action-type="${TASK_TOOLS_EVENTS.REMOVE_TASK}"></button>
 		`;
 		this.prepend(this.taskTools);
 
@@ -70,7 +70,7 @@ export default class Task extends HTMLElement {
 
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
 
-		if (!currentAction || !Object.values(TaskToolsEvent).includes(currentAction)) return;
+		if (!currentAction || !Object.values(TASK_TOOLS_EVENTS).includes(currentAction)) return;
 
 		const {id} = this;
 
