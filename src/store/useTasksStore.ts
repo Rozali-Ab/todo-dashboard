@@ -1,5 +1,5 @@
-import {LOCAL_STORAGE_KEYS} from '../constants/const.ts';
-import type {ListType, TaskType} from './types/types';
+import {LOCAL_STORAGE_KEYS} from '../constants/localStorageKeys.ts';
+import type {ColumnType, TaskType} from './types/types';
 
 const getFromLocalStorage = (key: string) => {
 	const data = localStorage.getItem(key);
@@ -7,12 +7,12 @@ const getFromLocalStorage = (key: string) => {
 	return data ? JSON.parse(data) : null;
 };
 
-const setToLocalStorage = (key: string, value: TaskType[] | ListType[]) => {
+const setToLocalStorage = (key: string, value: TaskType[] | ColumnType[]) => {
 	localStorage.setItem(key, JSON.stringify(value));
 };
 
 let tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
-let lists: ListType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.LISTS) || [];
+let columns: ColumnType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.COLUMNS) || [];
 
 export const useTasksStore = () => {
 
@@ -20,15 +20,15 @@ export const useTasksStore = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.TASKS, tasks);
 	};
 
-	const saveLists = () => {
-		setToLocalStorage(LOCAL_STORAGE_KEYS.LISTS, lists);
+	const saveColumns = () => {
+		setToLocalStorage(LOCAL_STORAGE_KEYS.COLUMNS, columns);
 	};
 
 	const createTask = (title: string) => {
 		const task: TaskType = {
 			id: tasks.length,
 			title: title,
-			parentListId: 0,
+			parentColumnId: 0,
 		};
 		tasks.push(task);
 		saveTasks();
@@ -36,16 +36,16 @@ export const useTasksStore = () => {
 		return task;
 	};
 
-	const createList = (title: string) => {
+	const createColumn = (title: string) => {
 
-		const list: ListType = {
-			id: lists.length,
+		const column: ColumnType = {
+			id: columns.length,
 			title: title,
-			order: lists.length
+			order: columns.length
 		};
-		lists.push(list);
-		saveLists();
-		return list;
+		columns.push(column);
+		saveColumns();
+		return column;
 	};
 
 	const removeTaskById = (taskId: number) => {
@@ -57,20 +57,20 @@ export const useTasksStore = () => {
 	};
 
 	const removeAllTasksByParentId = (parentId: number) => {
-		tasks = tasks.filter(task => task.parentListId !== parentId);
+		tasks = tasks.filter(task => task.parentColumnId !== parentId);
 		saveTasks();
 	};
 
-	const removeListById = (listId: number) => {
-		lists = lists.filter(list => list.id !== listId);
-		saveLists();
+	const removeColumnById = (columnId: number) => {
+		columns = columns.filter(column => column.id !== columnId);
+		saveColumns();
 	};
 
 	const updateTaskParentIdById = (taskId: number, parentId: number) => {
 		const updatedTask = tasks.find(task => task.id === taskId);
 
 		if (updatedTask) {
-			updatedTask.parentListId = parentId;
+			updatedTask.parentColumnId = parentId;
 			saveTasks();
 		}
 	};
@@ -82,33 +82,33 @@ export const useTasksStore = () => {
 		saveTasks();
 	};
 
-	const updateListById = (payload: ListType) => {
+	const updateColumnById = (payload: ColumnType) => {
 		const {id} = payload;
-		const index = lists.findIndex(list => list.id === id);
+		const index = columns.findIndex(column => column.id === id);
 
 		if (index >= 0) {
-			lists[index] = payload;
+			columns[index] = payload;
 		}
-		saveLists();
+		saveColumns();
 	};
 
-	const findListById = (listId: number) => {
-		if (listId) {
-			return lists.find(list => list.id === listId);
+	const findColumnById = (columnId: number) => {
+		if (columnId) {
+			return columns.find(column => column.id === columnId);
 		}
 	};
 
 	return {
 		tasks,
-		lists,
+		columns,
 		createTask,
-		createList,
+		createColumn,
 		removeTaskById,
 		removeAllTasksByParentId,
-		removeListById,
+		removeColumnById,
 		updateTaskParentIdById,
 		updateTaskTitle,
-		updateListById,
-		findListById
+		updateColumnById,
+		findColumnById
 	};
 };

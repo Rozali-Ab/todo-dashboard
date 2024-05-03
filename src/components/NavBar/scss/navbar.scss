@@ -1,4 +1,4 @@
-#add-list-btn, #add-new-task {
+#add-column-btn, #add-new-task {
   height: 60px;
   width: 30rem;
   text-transform: uppercase;
@@ -46,7 +46,7 @@ form {
   }
 }
 
-#cancel-list, #cancel-task {
+#cancel-column, #cancel-task {
   @include shadow-box;
   position: absolute;
   width: 15px;

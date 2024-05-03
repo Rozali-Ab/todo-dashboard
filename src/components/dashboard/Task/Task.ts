@@ -1,229 +1,139 @@
-import {editTaskEvent, removeTaskEvent} from '../../../events/events';
 import {TaskType} from '../../../store/types/types.ts';
-import {TaskToolsEvent} from '../../../constants/TaskToolsEvent.ts';
+import {TASK_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
 
 export default class Task extends HTMLElement {
 	id = '';
 	title = '';
 	parent = '';
+	taskTitle = document.createElement('div');
 	taskTools = document.createElement('div');
 
-	constructor(payload ? : TaskType ) {
+	constructor({id, title, parentColumnId}: TaskType) {
 
 		super();
-		this.setTaskAttributes(payload);
 
-		// this.innerHTML = template;
+		this.id = id.toString();
+		this.title = title;
+		this.parent = parentColumnId.toString();
 
+		this.setTaskAttributes();
 	}
 
-	onRemoveClick() {
-		this.dispatchEvent(removeTaskEvent());
-		this.remove();
+	/**
+ в конструкторе устанавливаем атрибуты
+	 */
+	setTaskAttributes() {
+
+		this.setAttribute('id', this.id);
+		this.setAttribute('title', this.title);
+		this.setAttribute('parent', this.parent);
+		this.setAttribute('draggable', 'true');
 	}
 
-	onEditClick() {
-		this.dispatchEvent(editTaskEvent());
+	getTaskAttributes() {
+		if (!this.id) {
+			this.id = this.getAttribute('id')!;
+		}
+
+		if (!this.title) {
+			this.title = this.getAttribute('title')!;
+		}
+
+		if (!this.parent) {
+			this.parent = this.getAttribute('parent')!;
+		}
 	}
 
 	connectedCallback() {
 		//mounted
 
+		this.getTaskAttributes();
 		this.buildTemplate();
-		this.taskTools.addEventListener( 'click', this.onTaskToolsClick );
-		//
-		// this.shadowRoot.querySelector('.task-title').textContent = this.title;
-		//
-		// this.shadowRoot.querySelector('[data-action="remove-task"]').addEventListener('click', this.onRemoveClick.bind(this));
-		// this.shadowRoot.querySelector('[data-action="edit-task"]').addEventListener('click', this.onEditClick.bind(this));
+		this.taskTools.addEventListener('click', this.onTaskToolsClick.bind(this));
 
 	}
 
-	disconnectedCallback() {
-		// "Unmount"
-		// this.shadowRoot.querySelector('[data-action="remove-task"]').removeEventListener('click', this.onRemoveClick.bind(this));
-		// this.shadowRoot.querySelector('[data-action-type="edit-task"]').removeEventListener('click', this.onEditClick.bind(this));
+	buildTemplate() {
+
+		this.classList.add('task');
+		this.taskTitle.classList.add('task-title');
+		this.taskTools.classList.add('task-tools');
+
+		this.taskTools.innerHTML = `
+			<button class="task-tools__edit" data-action-type="${TASK_TOOLS_EVENTS.EDIT_TASK}">edit</button>
+			<button class="task-tools__remove" data-action-type="${TASK_TOOLS_EVENTS.REMOVE_TASK}"></button>
+		`;
+		this.prepend(this.taskTools);
+
+		this.taskTitle.textContent = this.title;
+
+		this.append(this.taskTitle);
+
 	}
 
+	onTaskToolsClick(evt: MouseEvent) {
+
+		const currentAction = (evt.target as HTMLElement).dataset.actionType;
+
+		if (!currentAction || !Object.values(TASK_TOOLS_EVENTS).includes(currentAction)) return;
+
+		const {id} = this;
+
+		const event = new CustomEvent(currentAction, {
+			bubbles: true,
+			detail: {id}
+		});
+
+		if (currentAction === TASK_TOOLS_EVENTS.REMOVE_TASK) {
+			this.removeTask();
+		}
+
+		this.dispatchEvent(event);
+	}
+
+	removeTask() {
+
+		this.classList.add('remove');
+
+		setTimeout(() => {
+			this.remove();
+		}, 300);
+	}
+
+	/**
+		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
+	 */
 	static get observedAttributes() {
+
 		return ['title', 'parent'];
 	}
 
-	attributeChangedCallback(attribute, previousValue, currentValue) {
+	attributeChangedCallback(attribute: string) {
 
-	}
+		let currentValue;
 
-	onTaskToolsClick = (e) => {
+		if (attribute === 'title') {
 
-		const currentAction = e.target.dataset.actionType;
-		// задание со зведочкой починить this без стрелочной фнукции потеря контекста
-		
-		// сделать првоерку есть ли евент такой
-		const {id} = this;
+			currentValue = this.getAttribute(attribute);
 
-		const event = 	new CustomEvent(currentAction, {
-			bubbles: true,
-			detail: { id }
-		});
+			if (this.title === currentValue) return;
 
-		this.dispatchEvent(event);
-	};
-
-	buildTemplate  (){
-
-		this.setTaskAttributes();
-		this.classList.add('task');
-		this.setAttribute('draggable', 'true');
-
-		this.taskTools.innerHTML = ` <button   class="task-tools__edit"   data-action-type="${TaskToolsEvent.EDIT_TASK}">   edit </button> <button class="task-tools__remove" data-action-type="${TaskToolsEvent.REMOVE_TASK}">кай унтан </button>`;
-		this.prepend(this.taskTools);
-
-		const taskBody = document.createElement('div');
-		taskBody.innerHTML = `<div class="task-title"> ${this.title} id ${this.id} </div>`;
-		this.append(taskBody);
-
-	}
-
-	setTaskAttributes(payload = {}) {
-
-		const {id} = payload;
-		// проверять число ли id
-		this.id = id ? id : this.getAttribute('id');
-
-		this.title = this.getAttribute('title');
-		this.parent = this.getAttribute('parent');
-
-	}
-
-	updateData (payload = {}) {
-
-		console.log('updateData!');
-	}
-}
-
-/*import {useTasksStore} from '../../../store/useTasksStore.ts';
-import {List} from '../List/List.ts';
-import type {TaskType} from '../../../store/types/types';
-
-const template = (task: TaskType) => {
-	const {
-		id,
-		title,
-		parentListId,
-	} = task;
-
-	return `
-	  <div
-	      class="task"
-	      draggable="true"
-	      data-id="${id}"
-	      data-parent-list-id="${parentListId}"
-	  >
-	      <div class="task-tools">
-        <button
-          class="task-tools__edit"
-          data-action="edit-task"
-        >
-          edit
-        </button>
-        <button
-          class="task-tools__remove"
-          data-action="remove-task"
-        ></button>
-      </div>
-      <div class="task-type">Work</div>
-      <div class="task-title">${title}</div>
-      <div class="task-tags">
-        <span class="task-tag">tag</span>
-        <span class="task-tag">tag</span>
-        <span class="task-tag">tag</span>
-      </div>
-    </div>
-  `;
-};
-
-export const Task = (task: TaskType) => {
-	const {removeTaskById, updateTaskParentIdById, updateTaskTitle, createList} = useTasksStore();
-
-	const taskElement = document.querySelector(`.task[data-id="${task.id}"]`) as HTMLDivElement;
-	const titleElement = taskElement?.querySelector('.task-title');
-
-	const getTaskTemplate = () => {
-		return template(task);
-	};
-
-	const renderNewTask = () => {
-		const taskParentElement = document.querySelector('.task-list[data-id="0"]');
-
-		if (!taskParentElement) {
-			const list = createList('Task today');
-			List(list, [task]).renderList();
-			return;
+			if (currentValue)
+				this.title = currentValue;
+			this.taskTitle.textContent = this.title;
 		}
 
-		taskParentElement.insertAdjacentHTML('beforeend', getTaskTemplate());
-	};
+		if (attribute === 'parent') {
 
-	const renameTaskTitle = () => {
-		if (titleElement)
-			titleElement.textContent = task.title;
-		updateTaskTitle(task);
-	};
+			currentValue = this.getAttribute(attribute);
 
-	const updateParentId = (parentId: number) => {
-		task.parentListId = parentId;
-		taskElement.dataset.parentListId = parentId.toString();
-		updateTaskParentIdById(task.id, parentId);
-	};
+			if (this.parent === currentValue) return;
 
-	const removeTask = () => {
-		taskElement?.remove();
-		removeTaskById(task.id);
-	};
+			if (currentValue)
+				this.parent = currentValue;
+		}
 
-	return {
-		getTaskTemplate,
-		renameTaskTitle,
-		updateParentId,
-		removeTask,
-		renderNewTask
-	};
-};*/
+		console.log('attributeChangedCallback');
+	}
 
-/*export const Task = (task: TaskType) => {
-
-	const {
-		id,
-		title,
-		parentListId,
-	} = task;
-
-	return `
-	  <div
-	      class="task"
-	      draggable="true"
-	      data-id="${id}"
-	      data-parent-list-id="${parentListId}"
-	  >
-	      <div class="task-tools">
-        <button
-          class="task-tools__edit"
-          data-action="edit-task"
-        >
-          edit
-        </button>
-        <button
-          class="task-tools__remove"
-          data-action="remove-task"
-        ></button>
-      </div>
-      <div class="task-type">Work</div>
-      <div class="task-title">${title}</div>
-      <div class="task-tags">
-        <span class="task-tag">tag</span>
-        <span class="task-tag">tag</span>
-        <span class="task-tag">tag</span>
-      </div>
-    </div>
-  `;
-};*/
+}

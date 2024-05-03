@@ -2,8 +2,14 @@
   display: flex;
   margin: 0 -1rem;
   flex-wrap: wrap;
+  align-items: flex-start;
+
+  @media (max-width: 630px) {
+    margin: 0 auto;
+    justify-content: center;
+  }
 }
 
-.dragging {
-  scale: 1.03;
+task-component, column-component {
+  display: block;
 }

@@ -1,5 +1,5 @@
 //import {useTasksStore} from '../../store/useTasksStore.ts';
-//import {getFormData} from './utils/getFormData.ts';
+import {getFormData} from './utils/getFormData.ts';
 //import {Task} from '../dashboard/Task/Task.ts';
 import {modal} from './index.ts';
 import type {TaskType} from '../../store/types/types.ts';
@@ -8,13 +8,13 @@ import type {TaskType} from '../../store/types/types.ts';
 
 const formTemplate = ({title}: TaskType) => {
 	const isNew = title === '' ? 'New' : '';
-	return `
-		<form 
-			class="form-new-task"
-			id="form-new-task"
-		>
-      <label for="title">
-        ${isNew} Task Title
+
+	const form = document.createElement('form');
+	form.classList.add('form-new-task');
+	form.setAttribute('id', 'form-new-task');
+
+	form.innerHTML = `
+		<label for="title"> ${isNew} Task Title
 	      <input
 	          class="form-new-task__input"
 	          type="text"
@@ -25,45 +25,45 @@ const formTemplate = ({title}: TaskType) => {
 						required
 	          value="${title}"
 	      >
-      </label>
+    </label>
+    <div class="form-buttons">
+      <button type="button" id="cancel-task"></button>
+      <button type="submit" id="submit-task">Save</button>
+    </div>
+	`;
 
-      <div class="task-tags"></div>
-      <div class="form-buttons">
-        <button
-        	type="button"
-        	id="cancel-task"
-        >
-
-        </button>
-        <button
-        	type="submit"
-        	id="submit-task"
-        >
-        	Save
-        </button>
-      </div>
-  	</form>
-  `;
+	modal.append(form);
+	return form;
 };
 
 const emptyTask: TaskType = {
 	id: 0,
 	title: '',
-	parentListId: 0,
+	parentColumnId: 0,
 };
 
-export const useTaskForm = (taskPayload?: TaskType) => {
+export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
 
-	const showTaskForm = () => {
-		const taskToUse = taskPayload || emptyTask;
+	const taskToUse = Object.assign(emptyTask, taskPayload);
 
-		modal.innerHTML = formTemplate(taskToUse);
+	const showTaskForm = async (): Promise<TaskType> => {
+
+		const form = formTemplate(taskToUse);
+
 		modal.showModal();
 
-		/*		const form = document.getElementById('form-new-task');
-				form?.addEventListener('submit', (evt) => onSubmitForm(evt));*/
-		const cancelButton = document.getElementById('cancel-task');
-		cancelButton?.addEventListener('click', removeForm);
+		return new Promise((resolve, reject) => {
+			form.addEventListener('submit', (evt) => {
+				return resolve(onSubmitForm(evt));
+			});
+
+			const cancelButton = document.getElementById('cancel-task');
+			cancelButton?.addEventListener('click', () => {
+				removeForm();
+				reject();
+			});
+		});
+
 	};
 
 	const removeForm = () => {
@@ -71,26 +71,18 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 		modal.innerHTML = '';
 	};
 
-	/*	const onSubmitForm = (evt: SubmitEvent) => {
-			evt.preventDefault();
+	const onSubmitForm = (evt: SubmitEvent): TaskType => {
+		evt.preventDefault();
 
-			const formNode = evt.target as HTMLFormElement;
+		const formNode = evt.target as HTMLFormElement;
 
-			if (taskPayload?.title) {
-				taskPayload.title = getFormData(formNode).title;
-				Task(taskPayload).renameTaskTitle();
-				removeForm();
-				return;
-			}
-			const newTask = createTask((getFormData(formNode).title));
-			if (newTask) {
-				Task(newTask).renderNewTask();
-				removeForm();
-			}
-		};*/
+		taskToUse.title = getFormData(formNode).title;
+		//CREATE TASK IN STORE
+		removeForm();
+		return taskToUse;
+	};
 
 	return {
-		//onSubmitForm,
 		showTaskForm
 	};
 };
