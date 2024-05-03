@@ -1,226 +1,134 @@
-import {addTaskEvent, editListEvent, removeListEvent} from '../../../events/events';
-
-const template = document.createElement('template');
-template.innerHTML = `
-	<style>
-		.task-list {
-			display: flex;
-			flex-direction: column;
-			margin: 1rem;
-			padding: 1em;
-			width: 20rem;
-			background-color: rgba(255,255,255,0.23);
-	    border-radius: 1.5rem;
-		}
-		.task-list-header {
-			position: relative;
-	    display: flex;
-	    flex-direction: row;
-	    justify-content: space-between;
-	    margin-bottom: 1rem;
-		}
-		.task-list-title {
-	    font-size: 2rem;
-    	font-weight: 600;
-		}
-	</style>
-	<div class="task-list">
-		<div class="task-list-header">
-      <div class="task-list-title"></div>
-      <div class="task-list-settings ">
-        <div class="settigs-menu">
-          <button 
-          	class="settigs-menu__remove"
-          	data-action="remove-list"
-          >
-          	delete list
-          </button>
-          <button 
-          	class="settigs-menu__rename"
-          	data-action="rename-list"
-          >
-          	rename list
-          </button>
-          <button
-          	data-action="add-task"
-          >
-          	add task
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <slot name="task"></slot>
-	</div>
-`;
+import {ListProps, TaskType} from '../../../store/types/types.ts';
+import Task from '../Task/Task.ts';
+import {ListToolsEvents} from '../../../constants/ListToolsEvents.ts';
 
 export default class List extends HTMLElement {
 	id = '';
 	title = '';
+	taskArray;
+	listTools = document.createElement('div');
 
-	constructor(payload) {
+	constructor({list, tasks}: ListProps) {
+
 		super();
-		this.taskArray = [];
-		const shadow = this.attachShadow({mode: 'open'});
-		shadow.append(template.content.cloneNode(true));
+
+		this.id = list.id.toString();
+		this.title = list.title.toString();
+
+		if (tasks) {
+			this.taskArray = Array.isArray(tasks) ? tasks : [tasks];
+		}
+
+		this.setListAttributes();
 	}
 
-	onRemoveClick() {
-		this.dispatchEvent(removeListEvent());
-		this.remove();
+	/**
+  в конструкторе устанавливаем атрибуты
+	 */
+	setListAttributes() {
+
+		this.setAttribute('id', this.id);
+		this.setAttribute('title', this.title);
 	}
 
-	onEditClick() {
-		this.dispatchEvent(editListEvent());
-	}
-
-	onAddTaskClick() {
-		this.dispatchEvent(addTaskEvent());
+	/**
+ при билде их считаем
+	 */
+	getListAttributes() {
+		this.id = this.getAttribute('id')!;
+		this.title = this.getAttribute('title')!;
 	}
 
 	connectedCallback() {
 		//mounted
 
-		this.id = this.getAttribute('id');
-		this.title = this.getAttribute('title');
-
-		this.shadowRoot.querySelector('.task-list-title').textContent = this.title;
-
-		this.shadowRoot.querySelector('[data-action="remove-list"]').addEventListener('click', this.onRemoveClick.bind(this));
-		this.shadowRoot.querySelector('[data-action="rename-list"]').addEventListener('click', this.onEditClick.bind(this));
-		this.shadowRoot.querySelector('[data-action="add-task"]').addEventListener('click', this.onAddTaskClick.bind(this));
+		this.buildTemplate();
+		this.addEventListener('click', this.onListClick);
 
 	}
 
-	disconnectedCallback() {
-		// "Unmount"
-		this.shadowRoot.querySelector('[data-action="remove-list"]').removeEventListener('click', this.onRemoveClick.bind(this));
-		this.shadowRoot.querySelector('[data-action="rename-list"]').removeEventListener('click', this.onEditClick.bind(this));
+	setTask(task: TaskType) {
+		const taskComponent = new Task(task);
+		this.append(taskComponent);
 	}
 
+	buildTemplate() {
+
+		this.getListAttributes();
+		this.classList.add('task-list');
+
+		this.listTools.classList.add('list-tools');
+		this.listTools.innerHTML = `
+      <button class="list-tools__add" data-action-type=${ListToolsEvents.ADD_TASK}>add task</button>
+      <button class="list-tools__rename" data-action-type=${ListToolsEvents.EDIT_LIST}>edit list</button>
+      <button class="list-tools__remove" data-action-type=${ListToolsEvents.REMOVE_LIST}>delete list</button>
+		`;
+
+		this.prepend(this.listTools);
+
+		let listHeader = this.querySelector('.task-list-header');
+		let listTitle = this.querySelector('.task-list-title');
+
+		if (!listTitle) {
+			listHeader = document.createElement('div');
+			listHeader.classList.add('task-list-header');
+
+			listTitle = document.createElement('div');
+			listTitle.classList.add('task-list-title');
+
+			listHeader.append(listTitle);
+			this.append(listHeader);
+		}
+
+		listTitle.textContent = this.title;
+
+		//чтобы повторно таски не рендерил
+		if (this.taskArray && !this.querySelector('task-component')) {
+			this.taskArray.forEach((task) => {
+				this.setTask(task);
+			});
+		}
+	}
+
+	onListClick(evt: MouseEvent) {
+		if (!(evt.target as HTMLElement).dataset.actionType) return;
+
+		const currentAction = (evt.target as HTMLElement).dataset.actionType;
+
+		if (!currentAction || !Object.values(ListToolsEvents).includes(currentAction)) return;
+
+		const {id} = this;
+
+		const event = new CustomEvent(currentAction, {
+			bubbles: true,
+			detail: {id}
+		});
+
+		this.dispatchEvent(event);
+	}
+
+	/**
+		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
+	 */
 	static get observedAttributes() {
 		return ['title'];
 	}
 
-	attributeChangedCallback(attribute, previousValue, currentValue) {
-// attr change handle
+	attributeChangedCallback(attribute: string,) {
+
+		let previousValue;
+		let currentValue;
+
+		if (attribute === 'title') {
+
+			previousValue = this.title;
+			currentValue = this.getAttribute(attribute)!;
+
+			if (previousValue === currentValue) return;
+
+			this.title = currentValue;
+			this.buildTemplate();
+		}
 	}
 
 }
-
-/*
-import {useTasksStore} from '../../../store/useTasksStore.ts';
-import {Task} from '../Task/Task.ts';
-import type {ListType, TaskType} from '../../../store/types/types.ts';
-
-const dashboard = document.getElementById('dashboard');
-
-const template = (list: ListType, tasks?: TaskType[]) => {
-	const {id, title} = list;
-	const taskElements = tasks?.map(task => Task(task).getTaskTemplate()).join('') || '';
-	//const isHide = id === 0 ? 'hide' : '';
-
-	return `
-		<div
-			class="task-list"
-			data-id="${id}"
-		>
-		<div class="task-list-header">
-      <div class="task-list-title">${title}</div>
-      <div class="task-list-settings ">
-        <div class="settigs-menu">
-          <button
-          	class="settigs-menu__remove"
-          	data-action="remove-list"
-          >
-          	delete list
-          </button>
-          <button
-          	class="settigs-menu__rename"
-          	data-action="rename-list"
-          >
-          	rename list
-          </button>
-        </div>
-      </div>
-    </div>
-    ${taskElements}
-	</div>
-	`;
-};
-
-export const List = (list: ListType, tasks?: TaskType[]) => {
-	const {removeListById, removeAllTasksByParentId, updateListById} = useTasksStore();
-
-	const listElement = document.querySelector(`.task-list[data-id="${list.id}"]`);
-	const titleElement = listElement?.querySelector('.task-list-title');
-
-	const renderList = () => {
-		if (dashboard) {
-			dashboard.insertAdjacentHTML('beforeend', template(list, tasks));
-		}
-	};
-
-	const renameListTitle = () => {
-		if (titleElement)
-			titleElement.textContent = list.title;
-		updateListById(list);
-	};
-
-	const removeList = () => {
-		const isEmpty = listElement?.getElementsByClassName('task').length === 0;
-		if (isEmpty) {
-			listElement.remove();
-			removeListById(list.id);
-			return;
-		} else {
-			const confirmed = window.confirm('Remove list with all tasks?');
-			if (confirmed) {
-				listElement?.remove();
-				removeListById(list.id);
-				removeAllTasksByParentId(list.id);
-			}
-		}
-	};
-
-	return {
-		renderList,
-		renameListTitle,
-		removeList,
-	};
-};
-*/
-
-/*export const List = ({list, tasks}: ListProps) => {
-	const {id, title} = list;
-
-	const taskElements = tasks ? tasks.map(task => Task(task)).join('') : '';
-
-	return `
-		<div
-			class="task-list"
-			data-id="${id}"
-		>
-		<div class="task-list-header">
-      <div class="task-list-title">${title}</div>
-      <div class="task-list-settings">
-        <div class="settigs-menu">
-          <span
-          	class="settigs-menu__remove"
-          	data-action="remove-list"
-          >
-          	delete list
-          </span>
-          <span
-          	class="settigs-menu__rename"
-          	data-action="rename-list"
-          >
-          	rename list
-          </span>
-        </div>
-      </div>
-    </div>
-    ${taskElements}
-	</div>
-	`;
-};*/
