@@ -7,30 +7,50 @@ export const useDragDrop = () => {
 
 	const onDragStart = (evt: DragEvent) => {
 		const taskId = (evt.target as Task).id;
-		(evt.target as HTMLElement).classList.add('dragging');
+		(evt.target as Task).classList.add('dragging');
+
 		if (taskId) {
 			evt.dataTransfer?.setData('taskId', taskId);
+			setTimeout(() => (evt.target as Task).classList.add('hide'), 0);
 		}
 	};
 
-	const onDragEnter = (evt: DragEvent) => {
-// TODO почитать что такое  instanceof ;
-		if ( evt.target instanceof Task ) {
-			// или провверять по тегу
-
-			console.log('true!!');
-		}
+	const onDragLeave = (evt: DragEvent) => {
 		evt.preventDefault();
+
+		(evt.target as Task).classList.remove('drag-enter');
+
+	};
+
+	const onDragEnter = (evt: DragEvent) => {
+		evt.preventDefault();
+
+		if (evt.target instanceof Task) {
+
+			evt.target.classList.add('drag-enter');
+			((evt.target.closest('.task-list')) as List).style.paddingBottom = '';
+		}
+
+		if (evt.target ! instanceof Task) {
+			((evt.target.closest('.task-list')) as List).style.paddingBottom = '60px';
+		}
 
 	};
 
 	const onDragOver = (evt: DragEvent) => {
-
 		evt.preventDefault();
+
+	};
+	const onDragEnd = (evt: DragEvent) => {
+		evt.preventDefault();
+
+		(evt.target as Task).classList.remove('hide');
+		(((evt.target as Task).closest('task-list')) as List).style.paddingBottom = '15px';
 	};
 
 	const onDrop = (evt: DragEvent) => {
 		evt.preventDefault();
+		(evt.target as Task).classList.remove('drag-enter');
 
 		const list = (evt.target as HTMLElement).closest('task-list') as List;
 		if (list) {
@@ -83,8 +103,10 @@ export const useDragDrop = () => {
 
 	return {
 		onDragStart,
+		onDragLeave,
 		onDragEnter,
 		onDragOver,
+		onDragEnd,
 		onDrop,
 		onTouchMove,
 		onTouchEnd
