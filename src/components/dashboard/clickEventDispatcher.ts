@@ -1,3 +1,4 @@
+/*
 import {List} from './List/List.ts';
 import {Task} from './Task/Task.ts';
 import {useListForm} from '../NavBar/useListForm.ts';
@@ -48,3 +49,4 @@ export const clickEventDispatcher = (evt: MouseEvent) => {
 			break;
 	}
 };
+*/

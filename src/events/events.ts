@@ -1,3 +1,4 @@
+/*
 export const removeListEvent = () => new CustomEvent('remove-list', {
 	bubbles: true
 });
@@ -17,3 +18,4 @@ export const editTaskEvent = () => new CustomEvent('edit-task', {
 export const removeTaskEvent = () => new CustomEvent('remove-task', {
 	bubbles: true
 });
+*/

@@ -1,5 +1,5 @@
 //import {useTasksStore} from '../../store/useTasksStore.ts';
-//import {getFormData} from './utils/getFormData.ts';
+import {getFormData} from './utils/getFormData.ts';
 //import {Task} from '../dashboard/Task/Task.ts';
 import {modal} from './index.ts';
 import type {TaskType} from '../../store/types/types.ts';
@@ -60,8 +60,8 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 		modal.innerHTML = formTemplate(taskToUse);
 		modal.showModal();
 
-		/*		const form = document.getElementById('form-new-task');
-				form?.addEventListener('submit', (evt) => onSubmitForm(evt));*/
+		const form = document.getElementById('form-new-task');
+		form?.addEventListener('submit', (evt) => onSubmitForm(evt));
 		const cancelButton = document.getElementById('cancel-task');
 		cancelButton?.addEventListener('click', removeForm);
 	};
@@ -71,23 +71,23 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 		modal.innerHTML = '';
 	};
 
-	/*	const onSubmitForm = (evt: SubmitEvent) => {
-			evt.preventDefault();
+	const onSubmitForm = (evt: SubmitEvent) => {
+		evt.preventDefault();
 
-			const formNode = evt.target as HTMLFormElement;
+		const formNode = evt.target as HTMLFormElement;
 
-			if (taskPayload?.title) {
-				taskPayload.title = getFormData(formNode).title;
-				Task(taskPayload).renameTaskTitle();
-				removeForm();
-				return;
-			}
-			const newTask = createTask((getFormData(formNode).title));
-			if (newTask) {
-				Task(newTask).renderNewTask();
-				removeForm();
-			}
-		};*/
+		if (taskPayload?.title) {
+			//taskPayload.title = getFormData(formNode).title;
+			//Task(taskPayload).renameTaskTitle();
+			removeForm();
+			return getFormData(formNode);
+		}
+		/*const newTask = createTask((getFormData(formNode).title));
+		if (newTask) {
+			Task(newTask).renderNewTask();
+			removeForm();
+		}*/
+	};
 
 	return {
 		//onSubmitForm,
