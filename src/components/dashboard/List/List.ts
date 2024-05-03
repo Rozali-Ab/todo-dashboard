@@ -1,0 +1,134 @@
+import {ListProps, TaskType} from '../../../store/types/types.ts';
+import Task from '../Task/Task.ts';
+import {ListToolsEvents} from '../../../constants/ListToolsEvents.ts';
+
+export default class List extends HTMLElement {
+	id = '';
+	title = '';
+	taskArray;
+	listTools = document.createElement('div');
+
+	constructor({list, tasks}: ListProps) {
+
+		super();
+
+		this.id = list.id.toString();
+		this.title = list.title.toString();
+
+		if (tasks) {
+			this.taskArray = Array.isArray(tasks) ? tasks : [tasks];
+		}
+
+		this.setListAttributes();
+	}
+
+	/**
+  в конструкторе устанавливаем атрибуты
+	 */
+	setListAttributes() {
+
+		this.setAttribute('id', this.id);
+		this.setAttribute('title', this.title);
+	}
+
+	/**
+ при билде их считаем
+	 */
+	getListAttributes() {
+		this.id = this.getAttribute('id')!;
+		this.title = this.getAttribute('title')!;
+	}
+
+	connectedCallback() {
+		//mounted
+
+		this.buildTemplate();
+		this.addEventListener('click', this.onListClick);
+
+	}
+
+	setTask(task: TaskType) {
+		const taskComponent = new Task(task);
+		this.append(taskComponent);
+	}
+
+	buildTemplate() {
+
+		this.getListAttributes();
+		this.classList.add('task-list');
+
+		this.listTools.classList.add('list-tools');
+		this.listTools.innerHTML = `
+      <button class="list-tools__add" data-action-type=${ListToolsEvents.ADD_TASK}>add task</button>
+      <button class="list-tools__rename" data-action-type=${ListToolsEvents.EDIT_LIST}>edit list</button>
+      <button class="list-tools__remove" data-action-type=${ListToolsEvents.REMOVE_LIST}>delete list</button>
+		`;
+
+		this.prepend(this.listTools);
+
+		let listHeader = this.querySelector('.task-list-header');
+		let listTitle = this.querySelector('.task-list-title');
+
+		if (!listTitle) {
+			listHeader = document.createElement('div');
+			listHeader.classList.add('task-list-header');
+
+			listTitle = document.createElement('div');
+			listTitle.classList.add('task-list-title');
+
+			listHeader.append(listTitle);
+			this.append(listHeader);
+		}
+
+		listTitle.textContent = this.title;
+
+		//чтобы повторно таски не рендерил
+		if (this.taskArray && !this.querySelector('task-component')) {
+			this.taskArray.forEach((task) => {
+				this.setTask(task);
+			});
+		}
+	}
+
+	onListClick(evt: MouseEvent) {
+		if (!(evt.target as HTMLElement).dataset.actionType) return;
+
+		const currentAction = (evt.target as HTMLElement).dataset.actionType;
+
+		if (!currentAction || !Object.values(ListToolsEvents).includes(currentAction)) return;
+
+		const {id} = this;
+
+		const event = new CustomEvent(currentAction, {
+			bubbles: true,
+			detail: {id}
+		});
+
+		this.dispatchEvent(event);
+	}
+
+	/**
+		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
+	 */
+	static get observedAttributes() {
+		return ['title'];
+	}
+
+	attributeChangedCallback(attribute: string,) {
+
+		let previousValue;
+		let currentValue;
+
+		if (attribute === 'title') {
+
+			previousValue = this.title;
+			currentValue = this.getAttribute(attribute)!;
+
+			if (previousValue === currentValue) return;
+
+			this.title = currentValue;
+			this.buildTemplate();
+		}
+	}
+
+}
