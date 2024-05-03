@@ -3,13 +3,34 @@
   margin: 0 -1rem;
   flex-wrap: wrap;
   align-items: flex-start;
-
-  @media (max-width: 630px) {
-    margin: 0 auto;
-    justify-content: center;
-  }
 }
 
-task-component, column-component {
+.dragging {
+  scale: 1.03;
+}
+
+task-component, task-list {
   display: block;
+}
+
+.drag-enter {
+  position: relative;
+  margin-bottom: 60px;
+  margin-top: 5px;
+  transition: margin-bottom 1s ease-in-out;
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -60px;
+    height: 50px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: $radius;
+    background-color: $app-button-color;
+    transition: opacity 1s ease-in-out;
+
+  }
 }

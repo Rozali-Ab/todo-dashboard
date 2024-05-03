@@ -15,11 +15,30 @@
     cursor: grab;
   }
 
+  &-type {
+    padding: .2rem 1rem;
+    background-color: $task-type;
+    width: max-content;
+    border-radius: $radius;
+    font-size: 1rem;
+  }
+
   &-title {
     margin-top: .5rem;
     font-size: 2rem;
     word-break: break-all;
-    pointer-events: none;
+  }
+
+  &-tags {
+    @include fd-row;
+    justify-content: flex-end;
+    font-size: 1rem;
+
+    .task-tag {
+      display: inline-block;
+      margin-right: .3rem;
+      color: $app-text-color-extra;
+    }
   }
 
   &-tools {
@@ -60,27 +79,5 @@
         color: #fff;
       }
     }
-  }
-}
-
-.task.remove {
-  user-select: none;
-  animation: remove-task .5s ease;
-}
-
-@keyframes remove-task {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  20% {
-    opacity: .7;
-    transform: scale(.7);
-  }
-
-  100% {
-    opacity: .7;
-    transform: translateX(2000px) scale(.7);
   }
 }

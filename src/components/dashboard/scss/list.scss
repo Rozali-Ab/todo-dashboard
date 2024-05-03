@@ -1,0 +1,29 @@
+.task-list {
+  @include shadow-box;
+  @include fd-column;
+
+  position: relative;
+  margin: 0 0 1rem 1rem;
+  width: 300px;
+  opacity: 1;
+  transition: all .3s ease;
+
+  &-header {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  &-title {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+}
+
+.list-tools {
+  display: flex;
+  justify-content: flex-end;
+
+}
