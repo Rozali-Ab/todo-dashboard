@@ -5,8 +5,10 @@ import {ListToolsEvents} from '../../../constants/ListToolsEvents.ts';
 export default class List extends HTMLElement {
 	id = '';
 	title = '';
-	taskArray;
+	taskArray: TaskType[] = [];
 	listTools = document.createElement('div');
+	listHeader = document.createElement('div');
+	listTitle = document.createElement('div');
 
 	constructor({list, tasks}: ListProps) {
 
@@ -56,6 +58,8 @@ export default class List extends HTMLElement {
 
 		this.getListAttributes();
 		this.classList.add('task-list');
+		this.listHeader.classList.add('task-list-header');
+		this.listTitle.classList.add('task-list-title');
 
 		this.listTools.classList.add('list-tools');
 		this.listTools.innerHTML = `
@@ -64,23 +68,11 @@ export default class List extends HTMLElement {
       <button class="list-tools__remove" data-action-type=${ListToolsEvents.REMOVE_LIST}>delete list</button>
 		`;
 
-		this.prepend(this.listTools);
+		this.listTitle.textContent = this.title;
+		this.listHeader.append(this.listTools);
+		this.listHeader.append(this.listTitle);
 
-		let listHeader = this.querySelector('.task-list-header');
-		let listTitle = this.querySelector('.task-list-title');
-
-		if (!listTitle) {
-			listHeader = document.createElement('div');
-			listHeader.classList.add('task-list-header');
-
-			listTitle = document.createElement('div');
-			listTitle.classList.add('task-list-title');
-
-			listHeader.append(listTitle);
-			this.append(listHeader);
-		}
-
-		listTitle.textContent = this.title;
+		this.prepend(this.listHeader);
 
 		//чтобы повторно таски не рендерил
 		if (this.taskArray && !this.querySelector('task-component')) {
@@ -91,7 +83,6 @@ export default class List extends HTMLElement {
 	}
 
 	onListClick(evt: MouseEvent) {
-		if (!(evt.target as HTMLElement).dataset.actionType) return;
 
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
 
@@ -116,15 +107,13 @@ export default class List extends HTMLElement {
 
 	attributeChangedCallback(attribute: string,) {
 
-		let previousValue;
 		let currentValue;
 
 		if (attribute === 'title') {
 
-			previousValue = this.title;
 			currentValue = this.getAttribute(attribute)!;
 
-			if (previousValue === currentValue) return;
+			if (this.title === currentValue) return;
 
 			this.title = currentValue;
 			this.buildTemplate();
