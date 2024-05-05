@@ -70,9 +70,13 @@ if (dashboard) {
 
 		const listId = Number(detail.id || (evt.target as List).id);
 
+		// TODO вынести удаление в метод к listComponent
+
 		const listComponent = domListsMap.get(listId);
-		listComponent.addEventListener('transitionend', () => listComponent.remove());
-		listComponent.style.opacity = 0;
+		listComponent.classList.add('remove');
+		setTimeout(()=>{
+			listComponent.remove();
+		}, 400);
 
 	});
 

@@ -110,7 +110,7 @@ export default class List extends HTMLElement {
 		return ['title'];
 	}
 
-	attributeChangedCallback(attribute: string,) {
+	attributeChangedCallback(attribute: string) {
 
 		let currentValue;
 

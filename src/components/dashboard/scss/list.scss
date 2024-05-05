@@ -5,9 +5,8 @@
   position: relative;
   margin: 0 0 1rem 1rem;
   width: 300px;
-  opacity: 1;
-  transition: all .3s ease;
 
+  transition: all 3s ease;
   &-header {
     position: relative;
     display: flex;
@@ -19,6 +18,33 @@
   &-title {
     font-size: 2rem;
     font-weight: 600;
+  }
+}
+
+
+.task-list.remove {
+  user-select: none;
+  animation: remove-list .5s ease;
+}
+
+@keyframes remove-list {
+  0% {
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  70% {
+    width: 0;
+    margin: 0 ;
+    padding: 0;
+  }
+
+  100% {
+    opacity: 0;
+    width: 0;
+    margin: 0 ;
+    padding: 0;
+    overflow: hidden;
   }
 }
 
