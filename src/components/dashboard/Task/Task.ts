@@ -89,7 +89,7 @@ export default class Task extends HTMLElement {
 
 		return ['title', 'parent'];
 	}
-
+	
 	attributeChangedCallback(attribute: string) {
 
 		let currentValue;
@@ -101,7 +101,8 @@ export default class Task extends HTMLElement {
 			if (this.title === currentValue) return;
 
 			this.title = currentValue;
-			this.buildTemplate();
+			this.taskTitle.textContent = currentValue;
+	
 		}
 
 		if (attribute === 'parent') {
@@ -113,7 +114,6 @@ export default class Task extends HTMLElement {
 			this.buildTemplate();
 		}
 
-		console.log('attributeChangedCallback');
 	}
 
 }

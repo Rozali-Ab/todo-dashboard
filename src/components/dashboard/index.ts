@@ -100,7 +100,7 @@ if (dashboard) {
 		console.log('add-task custom event id: ', (evt.target as List).id);
 	});
 
-	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, (evt) => {
+	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, async (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
@@ -110,8 +110,17 @@ if (dashboard) {
 
 		const currentTask = tasks.find(task => task.id === Number(taskId));
 
-		useTaskForm(currentTask).showTaskForm();
+		try {
 
+		const {showTaskForm} =  useTaskForm(currentTask);
+
+		const {title} =  await showTaskForm();
+
+		 domTaskMap.get(taskId).setAttribute('title',title);
+
+		} catch (e) {
+			console.log('edit task err',e);
+		}
 	});
 
 	dashboard.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => {

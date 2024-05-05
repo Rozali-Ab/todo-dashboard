@@ -7,12 +7,13 @@ import type {TaskType} from '../../store/types/types.ts';
 //const {createTask} = useTasksStore();
 
 const formTemplate = ({title}: TaskType) => {
+
 	const isNew = title === '' ? 'New' : '';
-	return `
-		<form 
-			class="form-new-task"
-			id="form-new-task"
-		>
+	const form = document.createElement('form');
+	form.classList.add('form-new-task');
+	form.setAttribute('id','form-new-task');
+
+	form.innerHTML = `
       <label for="title">
         ${isNew} Task Title
 	      <input
@@ -42,8 +43,10 @@ const formTemplate = ({title}: TaskType) => {
         	Save
         </button>
       </div>
-  	</form>
   `;
+
+	modal.append(form);
+	return form;
 };
 
 const emptyTask: TaskType = {
@@ -54,16 +57,26 @@ const emptyTask: TaskType = {
 
 export const useTaskForm = (taskPayload?: TaskType) => {
 
-	const showTaskForm = () => {
-		const taskToUse = taskPayload || emptyTask;
+	const showTaskForm = async () => {
+		const taskToUse = Object.assign(emptyTask,taskPayload);
 
-		modal.innerHTML = formTemplate(taskToUse);
+		const form =		formTemplate(taskToUse);
 		modal.showModal();
 
-		const form = document.getElementById('form-new-task');
-		form?.addEventListener('submit', (evt) => onSubmitForm(evt));
-		const cancelButton = document.getElementById('cancel-task');
-		cancelButton?.addEventListener('click', removeForm);
+		return new Promise((resolve, reject) => {
+
+			form?.addEventListener('submit', (evt) => {
+				return resolve(		onSubmitForm(evt));
+			});
+
+			const cancelButton = document.getElementById('cancel-task');
+
+			cancelButton?.addEventListener('click', ()=>{
+				removeForm();
+				reject();
+			});
+
+		});
 	};
 
 	const removeForm = () => {
@@ -90,7 +103,7 @@ export const useTaskForm = (taskPayload?: TaskType) => {
 	};
 
 	return {
-		//onSubmitForm,
+		onSubmitForm,
 		showTaskForm
 	};
 };
