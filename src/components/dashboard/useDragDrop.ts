@@ -1,58 +1,65 @@
 import {useTasksStore} from '../../store/useTasksStore.ts';
 import Task from './Task/Task.ts';
 import List from './List/List.ts';
-
+const {updateTaskParentIdById} = useTasksStore();
 export const useDragDrop = () => {
-	const {updateTaskParentIdById} = useTasksStore();
-
+let currentTaskId = undefined;
 	const onDragStart = (evt: DragEvent) => {
+
+		// @ts-ignore
+		if (!evt.target instanceof Task) {
+			return;
+		}
+
 		const taskId = (evt.target as Task).id;
-		(evt.target as Task).classList.add('dragging');
+		currentTaskId =  taskId;
 
 		if (taskId) {
-			evt.dataTransfer?.setData('taskId', taskId);
-			setTimeout(() => (evt.target as Task).classList.add('hide'), 0);
+			// evt.dataTransfer?.setData('taskId', taskId);
+			evt.target.classList.add('drag-start-target');
+
+			// setTimeout(() => (evt.target as Task).classList.add('drag-start-target'), 0);
 		}
+
 	};
 
-	const onDragLeave = (evt: DragEvent) => {
+	const onDragEnd = (evt: DragEvent) => {
 		evt.preventDefault();
 
-		(evt.target as Task).classList.remove('drag-enter');
+		(evt.target as Task).classList.remove('drag-start-target');
 
+		// (((evt.target as Task).closest('task-list')) as List).style.paddingBottom = '15px';
 	};
 
 	const onDragEnter = (evt: DragEvent) => {
 		evt.preventDefault();
 
-		if (evt.target instanceof Task) {
-
-			evt.target.classList.add('drag-enter');
-			((evt.target.closest('.task-list')) as List).style.paddingBottom = '';
+		if (evt.target instanceof Task || evt.target  instanceof List) {
+			evt.target.classList.add('on-drag-enter');
+			return;
 		}
-
-		if (evt.target ! instanceof Task) {
-			((evt.target.closest('.task-list')) as List).style.paddingBottom = '60px';
-		}
-
 	};
 
 	const onDragOver = (evt: DragEvent) => {
-		evt.preventDefault();
-
+		// console.log('drag ver',evt.target);
+		// evt.preventDefault();
 	};
-	const onDragEnd = (evt: DragEvent) => {
+
+	const onDragLeave = (evt: DragEvent) => {
 		evt.preventDefault();
 
-		(evt.target as Task).classList.remove('hide');
-		(((evt.target as Task).closest('task-list')) as List).style.paddingBottom = '15px';
+		if (evt.target instanceof Task || evt.target  instanceof List) {
+			evt.target.classList.remove('on-drag-enter');
+			return;
+		}
 	};
 
 	const onDrop = (evt: DragEvent) => {
 		evt.preventDefault();
 		(evt.target as Task).classList.remove('drag-enter');
-
+		console.log(' onDrop',evt.target);
 		const list = (evt.target as HTMLElement).closest('task-list') as List;
+
 		if (list) {
 
 			const listId = Number(list.id);

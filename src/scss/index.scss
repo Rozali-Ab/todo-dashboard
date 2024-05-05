@@ -7,3 +7,18 @@
 '@/components/dashboard/scss/task',
 '@/components/dashboard/scss/list',
 '@/components/NavBar/scss/navbar';
+
+.on-drag-enter {
+  box-shadow: 0 0 3px 7px red;
+  //для такска в зависимости от положения марджин боттом или топ
+}
+
+.drag-start-target {
+  background-color: royalblue;
+  overflow: hidden;
+
+  &:active {
+    border: 2px solid darkorange;
+    overflow: hidden;
+  }
+}
