@@ -5,6 +5,7 @@ export default class Task extends HTMLElement {
 	id = '';
 	title = '';
 	parent = '';
+	taskTitle = document.createElement('div');
 	taskTools = document.createElement('div');
 
 	constructor({id, title, parentListId}: TaskType) {
@@ -50,31 +51,25 @@ export default class Task extends HTMLElement {
 
 		this.getTaskAttributes();
 		this.classList.add('task');
-
+		this.taskTitle.classList.add('task-title');
 		this.taskTools.classList.add('task-tools');
+
 		this.taskTools.innerHTML = `
 			<button class="task-tools__edit" data-action-type="${TaskToolsEvent.EDIT_TASK}">edit</button>
 			<button class="task-tools__remove" data-action-type="${TaskToolsEvent.REMOVE_TASK}"></button>
 		`;
 		this.prepend(this.taskTools);
 
-		let taskTitle = this.querySelector('.task-title');
-		if (!taskTitle) {
-			taskTitle = document.createElement('div');
-			taskTitle.classList.add('task-title');
-			this.append(taskTitle);
-		}
-		taskTitle.textContent = this.title;
+		this.taskTitle.textContent = this.title;
 
-		this.append(taskTitle);
+		this.append(this.taskTitle);
 
 	}
 
 	onTaskToolsClick(evt: MouseEvent) {
 
-		if (!(evt.target as HTMLElement).dataset.actionType) return;
-
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
+
 		if (!currentAction || !Object.values(TaskToolsEvent).includes(currentAction)) return;
 
 		const {id} = this;
@@ -97,24 +92,23 @@ export default class Task extends HTMLElement {
 
 	attributeChangedCallback(attribute: string) {
 
-		let previousValue;
 		let currentValue;
 
 		if (attribute === 'title') {
-			previousValue = this.title;
+
 			currentValue = this.getAttribute(attribute)!;
 
-			if (previousValue === currentValue) return;
+			if (this.title === currentValue) return;
 
 			this.title = currentValue;
 			this.buildTemplate();
 		}
 
 		if (attribute === 'parent') {
-			previousValue = this.parent;
+
 			currentValue = this.getAttribute(attribute)!;
 
-			if (previousValue === currentValue) return;
+			if (this.parent === currentValue) return;
 			this.parent = currentValue;
 			this.buildTemplate();
 		}
