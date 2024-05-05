@@ -13,7 +13,7 @@ const {onDragStart, onDragLeave, onDragEnter, onDragOver, onDragEnd, onDrop, onT
 const dashboard = document.querySelector<HTMLElement>('#dashboard');
 
 const domListsMap = new Map();
-
+const domTaskMap = new Map();
 const tasks = [
 
 	{id: 0, title: 'Task 1', parentListId: 0},
@@ -54,7 +54,12 @@ if (dashboard) {
 			const {id} = list;
 			const taskInList: TaskType | TaskType[] = groupedTasksByParent.get(id);
 
-			const listComponent = taskInList ? new List({list, tasks: taskInList}) : new List({list});
+			const listComponent = taskInList ? new List({list}) : new List({list});
+
+			taskInList.forEach((item)=>{
+			const task = 	listComponent.appendTask(item);
+				domTaskMap.set(item.id,task);
+			});
 
 			domListsMap.set(id, listComponent);
 			dashboard.appendChild(listComponent);

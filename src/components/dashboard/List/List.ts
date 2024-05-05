@@ -18,6 +18,7 @@ export default class List extends HTMLElement {
 		this.title = list.title.toString();
 
 		if (tasks) {
+			// TODO может быть без масива?
 			this.taskArray = Array.isArray(tasks) ? tasks : [tasks];
 		}
 
@@ -55,9 +56,10 @@ export default class List extends HTMLElement {
 
 	}
 
-	setTask(task: TaskType) {
+	appendTask(task: TaskType) {
 		const taskComponent = new Task(task);
 		this.append(taskComponent);
+		return taskComponent;
 	}
 
 	buildTemplate() {
@@ -79,12 +81,6 @@ export default class List extends HTMLElement {
 
 		this.prepend(this.listHeader);
 
-		//чтобы повторно таски не рендерил
-		if (this.taskArray && !this.querySelector('task-component')) {
-			this.taskArray.forEach((task) => {
-				this.setTask(task);
-			});
-		}
 	}
 
 	onListClick(evt: MouseEvent) {
@@ -116,12 +112,12 @@ export default class List extends HTMLElement {
 
 		if (attribute === 'title') {
 
-			currentValue = this.getAttribute(attribute)!;
-
-			if (this.title === currentValue) return;
-
-			this.title = currentValue;
-			this.buildTemplate();
+			// currentValue = this.getAttribute(attribute)!;
+			//
+			// if (this.title === currentValue) return;
+			//
+			// this.title = currentValue;
+			// this.buildTemplate();
 		}
 	}
 
