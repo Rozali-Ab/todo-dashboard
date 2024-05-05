@@ -37,13 +37,19 @@ export default class List extends HTMLElement {
  при билде их считаем
 	 */
 	getListAttributes() {
-		this.id = this.getAttribute('id')!;
-		this.title = this.getAttribute('title')!;
+
+		if (!this.id) {
+			this.id  = this.getAttribute('id')!;
+		}
+
+		if (!this.title) {
+			this.title = this.getAttribute('title')!;
+		}
 	}
 
 	connectedCallback() {
 		//mounted
-
+		this.getListAttributes();
 		this.buildTemplate();
 		this.addEventListener('click', this.onListClick);
 
@@ -55,8 +61,7 @@ export default class List extends HTMLElement {
 	}
 
 	buildTemplate() {
-
-		this.getListAttributes();
+	
 		this.classList.add('task-list');
 		this.listHeader.classList.add('task-list-header');
 		this.listTitle.classList.add('task-list-title');
