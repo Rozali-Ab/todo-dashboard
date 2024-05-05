@@ -66,21 +66,21 @@ export default class Task extends HTMLElement {
 
 	}
 
-	onTaskToolsClick(evt: MouseEvent) {
+	onTaskToolsClick = (e) => {
 
-		const currentAction = (evt.target as HTMLElement).dataset.actionType;
+		const currentAction = e.target.dataset.actionType;
+		// задание со зведочкой починить this без стрелочной фнукции потеря контекста bind
 
-		if (!currentAction || !Object.values(TASK_TOOLS_EVENTS).includes(currentAction)) return;
-
+		// сделать првоерку есть ли евент такой
 		const {id} = this;
 
-		const event = new CustomEvent(currentAction, {
+		const event = 	new CustomEvent(currentAction, {
 			bubbles: true,
-			detail: {id}
+			detail: { id }
 		});
 
 		this.dispatchEvent(event);
-	}
+	};
 
 	/**
 		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
