@@ -1,6 +1,6 @@
 import {ListProps, TaskType} from '../../../store/types/types.ts';
 import Task from '../Task/Task.ts';
-import {ListToolsEvents} from '../../../constants/ListToolsEvents.ts';
+import {LIST_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
 
 export default class List extends HTMLElement {
 	id = '';
@@ -63,9 +63,9 @@ export default class List extends HTMLElement {
 
 		this.listTools.classList.add('list-tools');
 		this.listTools.innerHTML = `
-      <button class="list-tools__add" data-action-type=${ListToolsEvents.ADD_TASK}>add task</button>
-      <button class="list-tools__rename" data-action-type=${ListToolsEvents.EDIT_LIST}>edit list</button>
-      <button class="list-tools__remove" data-action-type=${ListToolsEvents.REMOVE_LIST}>delete list</button>
+      <button class="list-tools__add" data-action-type=${LIST_TOOLS_EVENTS.ADD_TASK}>add task</button>
+      <button class="list-tools__rename" data-action-type=${LIST_TOOLS_EVENTS.EDIT_LIST}>edit list</button>
+      <button class="list-tools__remove" data-action-type=${LIST_TOOLS_EVENTS.REMOVE_LIST}>delete list</button>
 		`;
 
 		this.listTitle.textContent = this.title;
@@ -86,7 +86,7 @@ export default class List extends HTMLElement {
 
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
 
-		if (!currentAction || !Object.values(ListToolsEvents).includes(currentAction)) return;
+		if (!currentAction || !Object.values(LIST_TOOLS_EVENTS).includes(currentAction)) return;
 
 		const {id} = this;
 
