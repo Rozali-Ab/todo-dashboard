@@ -3,8 +3,7 @@ import Task from './Task/Task';
 import {useDragDrop} from './useDragDrop';
 import {useTaskForm} from '../NavBar/useTaskForm.ts';
 import {useListForm} from '../NavBar/useListForm.ts';
-import {TaskToolsEvent} from '../../constants/TaskToolsEvent.ts';
-import {ListToolsEvents} from '../../constants/ListToolsEvents.ts';
+import {LIST_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
 import type {TaskType} from '../../store/types/types.ts';
 
 customElements.define('task-list', List);
@@ -65,7 +64,7 @@ if (dashboard) {
 
 	createComponents();
 
-	dashboard.addEventListener(ListToolsEvents.REMOVE_LIST, (evt) => {
+	dashboard.addEventListener(LIST_TOOLS_EVENTS.REMOVE_LIST, (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
@@ -77,7 +76,7 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener(ListToolsEvents.EDIT_LIST, (evt) => {
+	dashboard.addEventListener(LIST_TOOLS_EVENTS.EDIT_LIST, (evt) => {
 
 		const listId = Number((evt.target as List).id);
 		const currenList = lists.find(list => list.id === listId);
@@ -87,12 +86,12 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener(ListToolsEvents.ADD_TASK, (evt) => {
+	dashboard.addEventListener(LIST_TOOLS_EVENTS.ADD_TASK, (evt) => {
 		//получаем id листа, в котором добавить таску
 		console.log('add-task custom event id: ', (evt.target as List).id);
 	});
 
-	dashboard.addEventListener(TaskToolsEvent.EDIT_TASK, (evt) => {
+	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
@@ -106,7 +105,7 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener(TaskToolsEvent.REMOVE_TASK, (evt) => {
+	dashboard.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
