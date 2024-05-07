@@ -48,7 +48,7 @@ export default class List extends HTMLElement {
 
 		this.getListAttributes();
 		this.buildTemplate();
-		this.addEventListener('click', this.onListClick);
+		this.listTools.addEventListener('click', this.onListToolsClick.bind(this));
 
 	}
 
@@ -84,7 +84,7 @@ export default class List extends HTMLElement {
 		}
 	}
 
-	onListClick(evt: MouseEvent) {
+	onListToolsClick(evt: MouseEvent) {
 
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
 
@@ -97,7 +97,19 @@ export default class List extends HTMLElement {
 			detail: {id}
 		});
 
+		if (currentAction === LIST_TOOLS_EVENTS.REMOVE_LIST) {
+			this.removeList();
+		}
+
 		this.dispatchEvent(event);
+	}
+
+	removeList() {
+		this.classList.add('remove');
+
+		setTimeout(() => {
+			this.remove();
+		}, 500);
 	}
 
 	/**
