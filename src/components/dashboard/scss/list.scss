@@ -5,7 +5,7 @@
   position: relative;
   margin: 0 0 1rem 1rem;
   width: 300px;
-  opacity: 1;
+  overflow: hidden;
   transition: all .3s ease;
 
   &-header {
@@ -25,5 +25,20 @@
 .list-tools {
   display: flex;
   justify-content: flex-end;
+}
+
+.task-list.remove {
+  user-select: none;
+  animation: remove-list .5s ease;
+}
+
+@keyframes remove-list {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -2000px, 0);
+  }
 
 }

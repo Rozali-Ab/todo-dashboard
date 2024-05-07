@@ -49,7 +49,7 @@ export default class Task extends HTMLElement {
 
 		this.getTaskAttributes();
 		this.buildTemplate();
-		this.addEventListener('click', this.onTaskToolsClick);
+		this.taskTools.addEventListener('click', this.onTaskToolsClick.bind(this));
 
 	}
 
@@ -84,7 +84,20 @@ export default class Task extends HTMLElement {
 			detail: {id}
 		});
 
+		if (currentAction === TASK_TOOLS_EVENTS.REMOVE_TASK) {
+			this.removeTask();
+		}
+
 		this.dispatchEvent(event);
+	}
+
+	removeTask() {
+
+		this.classList.add('remove');
+
+		setTimeout(() => {
+			this.remove();
+		}, 300);
 	}
 
 	/**

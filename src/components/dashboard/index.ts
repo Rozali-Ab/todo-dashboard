@@ -69,10 +69,7 @@ if (dashboard) {
 		const {detail} = evt as CustomEvent;
 
 		const listId = Number(detail.id || (evt.target as List).id);
-
-		const listComponent = domListsMap.get(listId);
-		listComponent.addEventListener('transitionend', () => listComponent.remove());
-		listComponent.style.opacity = 0;
+		console.log('listId ', listId);
 
 	});
 
@@ -110,17 +107,8 @@ if (dashboard) {
 		const {detail} = evt as CustomEvent;
 
 		const taskId = Number(detail.id || (evt.target as Task).id);
-		const listId = Number((evt.target as Task).parent);
+		console.log('taskId ', taskId);
 
-		if (listId !== undefined) {
-
-			const listComponent = domListsMap.get(listId);
-
-			const taskComponent = listComponent.querySelector(`task-component[id="${taskId}"]`);
-			taskComponent.addEventListener('transitionend', () => taskComponent.remove());
-			taskComponent.style.opacity = 0;
-
-		}
 	});
 
 	dashboard.addEventListener('dragleave', (evt: DragEvent) => onDragLeave(evt));
