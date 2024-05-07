@@ -30,18 +30,24 @@ export default class Task extends HTMLElement {
 		this.setAttribute('draggable', 'true');
 	}
 
-	/**
- при билде их считаем
-	 */
 	getTaskAttributes() {
-		this.id = this.getAttribute('id')!;
-		this.title = this.getAttribute('title')!;
-		this.parent = this.getAttribute('parent')!;
+		if (!this.id) {
+			this.id = this.getAttribute('id')!;
+		}
+
+		if (!this.title) {
+			this.title = this.getAttribute('title')!;
+		}
+
+		if (!this.parent) {
+			this.parent = this.getAttribute('parent')!;
+		}
 	}
 
 	connectedCallback() {
 		//mounted
 
+		this.getTaskAttributes();
 		this.buildTemplate();
 		this.addEventListener('click', this.onTaskToolsClick);
 
@@ -49,7 +55,6 @@ export default class Task extends HTMLElement {
 
 	buildTemplate() {
 
-		this.getTaskAttributes();
 		this.classList.add('task');
 		this.taskTitle.classList.add('task-title');
 		this.taskTools.classList.add('task-tools');
