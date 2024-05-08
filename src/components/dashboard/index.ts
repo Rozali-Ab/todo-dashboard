@@ -1,15 +1,27 @@
 import List from './List/List';
 import Task from './Task/Task';
-import {useDragDrop} from './useDragDrop';
+import {useDnD} from './useDnD.ts';
 import {useTaskForm} from '../NavBar/useTaskForm.ts';
 import {useListForm} from '../NavBar/useListForm.ts';
 import {LIST_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
 import type {TaskType} from '../../store/types/types.ts';
+import {useTouchDnD} from './useTouchDnD.ts';
 
 customElements.define('task-list', List);
 customElements.define('task-component', Task);
 
-const {onDragStart, onDragLeave, onDragEnter, onDragOver, onDragEnd, onDrop, onTouchMove, onTouchEnd} = useDragDrop();
+const {
+	onDragStart,
+	onDragOver,
+	onDragEnd,
+} = useDnD();
+
+const {
+	onTouchStart,
+	onTouchMove,
+	onTouchEnd
+} = useTouchDnD();
+
 const dashboard = document.querySelector<HTMLElement>('#dashboard');
 
 const domListsMap = new Map();
@@ -111,14 +123,11 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener('dragleave', (evt: DragEvent) => onDragLeave(evt));
-	dashboard.addEventListener('dragover', (evt: DragEvent) => onDragOver(evt));
-	dashboard.addEventListener('dragenter', (evt: DragEvent) => onDragEnter(evt));
 	dashboard.addEventListener('dragstart', (evt: DragEvent) => onDragStart(evt));
-	dashboard.addEventListener('dragend', (evt: DragEvent) => onDragEnd(evt));
-	dashboard.addEventListener('drop', (evt: DragEvent) => onDrop(evt));
+	dashboard.addEventListener('dragover', (evt: DragEvent) => onDragOver(evt));
+	dashboard.addEventListener('dragend', onDragEnd);
 
+	dashboard.addEventListener('touchstart', (evt: TouchEvent) => onTouchStart(evt));
 	dashboard.addEventListener('touchmove', (evt: TouchEvent) => onTouchMove(evt));
-	dashboard.addEventListener('touchend', (evt: TouchEvent) => onTouchEnd(evt));
-
+	dashboard.addEventListener('touchend', onTouchEnd);
 }
