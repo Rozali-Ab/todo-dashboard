@@ -1,5 +1,5 @@
 import Task from './Task/Task.ts';
-import Column from './Column/Column.ts';
+import List from './List/List.ts';
 
 export const useTouchDnD = () => {
 	let draggingTask: Task;
@@ -34,16 +34,16 @@ export const useTouchDnD = () => {
 
 		if (target instanceof Task) {
 
-			const column = target.closest('.column-component');
+			const list = target.closest('.task-list');
 
-			if (column && target && target !== draggingTask) {
+			if (list && target && target !== draggingTask) {
 				const rect = target.getBoundingClientRect();
 				const offsetY = touch.clientY - rect.top;
 
 				if (offsetY > rect.height / 2) {
-					column.insertBefore(placeholder, target.nextSibling);
+					list.insertBefore(placeholder, target.nextSibling);
 				} else {
-					column.insertBefore(placeholder, target);
+					list.insertBefore(placeholder, target);
 				}
 			}
 		}
@@ -56,7 +56,7 @@ export const useTouchDnD = () => {
 		draggingTask.style.zIndex = '';
 		draggingTask.style.transform = '';
 
-		if (placeholder.parentNode instanceof Column) {
+		if (placeholder.parentNode instanceof List) {
 
 			draggingTask.setAttribute('parent', placeholder.parentNode.id);
 
