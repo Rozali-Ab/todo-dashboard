@@ -22,7 +22,7 @@ const {
 	onTouchEnd
 } = useTouchDnD();
 
-const dashboard = document.getElementById('dashboard');
+export const dashboard = document.getElementById('dashboard');
 
 const domColumnsMap = new Map();
 const domTasksMap = new Map();
@@ -91,13 +91,21 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, (evt) => {
+	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, async (evt) => {
 
 		const columnId = Number((evt.target as Column).id);
 		const currenList = columns.find(column => column.id === columnId);
 
-		domColumnsMap.get(columnId).setAttribute('title', 'Edit');
-		useColumnForm(currenList).showColumnForm();
+		const {showColumnForm} = useColumnForm(currenList);
+
+		try {
+
+			const updatedColumn = await showColumnForm();
+
+			domColumnsMap.get(columnId).setAttribute('title', updatedColumn.title);
+		} catch (e) {
+			console.log('edit column rejected ', e);
+		}
 
 	});
 
