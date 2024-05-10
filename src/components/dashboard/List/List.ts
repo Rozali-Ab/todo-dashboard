@@ -1,4 +1,4 @@
-import {ListProps, TaskType} from '../../../store/types/types.ts';
+import {ListType, TaskType} from '../../../store/types/types.ts';
 import Task from '../Task/Task.ts';
 import {LIST_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
 
@@ -10,17 +10,12 @@ export default class List extends HTMLElement {
 	listHeader = document.createElement('div');
 	listTitle = document.createElement('div');
 
-	constructor({list, tasks}: ListProps) {
+	constructor({id, title}: ListType) {
 
 		super();
 
-		this.id = list.id.toString();
-		this.title = list.title.toString();
-
-		if (tasks) {
-			this.taskArray = Array.isArray(tasks) ? tasks : [tasks];
-		}
-
+		this.id = id.toString();
+		this.title = title.toString();
 		this.setListAttributes();
 	}
 
@@ -52,9 +47,14 @@ export default class List extends HTMLElement {
 
 	}
 
-	setTask(task: TaskType) {
+	appendTask(task: TaskType) {
+
+		this.taskArray.push(task);
+
 		const taskComponent = new Task(task);
 		this.append(taskComponent);
+
+		return taskComponent;
 	}
 
 	buildTemplate() {
@@ -76,12 +76,6 @@ export default class List extends HTMLElement {
 
 		this.prepend(this.listHeader);
 
-		//чтобы повторно таски не рендерил
-		if (this.taskArray && !this.querySelector('task-component')) {
-			this.taskArray.forEach((task) => {
-				this.setTask(task);
-			});
-		}
 	}
 
 	onListToolsClick(evt: MouseEvent) {
