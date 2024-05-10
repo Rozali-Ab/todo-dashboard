@@ -1,13 +1,13 @@
-import List from './List/List';
+import Column from './Column/Column';
 import Task from './Task/Task';
 import {useDnD} from './useDnD.ts';
 import {useTaskForm} from '../NavBar/useTaskForm.ts';
-import {useListForm} from '../NavBar/useListForm.ts';
-import {LIST_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
+import {useColumnForm} from '../NavBar/useColumnForm.ts';
+import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
 import type {TaskType} from '../../store/types/types.ts';
 import {useTouchDnD} from './useTouchDnD.ts';
 
-customElements.define('task-list', List);
+customElements.define('column-component', Column);
 customElements.define('task-component', Task);
 
 const {
@@ -24,24 +24,24 @@ const {
 
 const dashboard = document.getElementById('dashboard');
 
-const domListsMap = new Map();
+const domColumnsMap = new Map();
 const domTasksMap = new Map();
 
 const tasks = [
 
-	{id: 0, title: 'Task 1', parentListId: 0},
-	{id: 1, title: 'Task 2', parentListId: 0},
-	{id: 2, title: 'Task 3', parentListId: 0},
-	{id: 3, title: 'Task 4', parentListId: 1},
-	{id: 4, title: 'Task 5', parentListId: 1},
-	{id: 5, title: 'Task 6', parentListId: 1},
-	{id: 6, title: 'Task 7', parentListId: 2},
-	{id: 7, title: 'Task 8', parentListId: 2},
-	{id: 8, title: 'Task 9', parentListId: 2}
+	{id: 0, title: 'Task 1', parentColumnId: 0},
+	{id: 1, title: 'Task 2', parentColumnId: 0},
+	{id: 2, title: 'Task 3', parentColumnId: 0},
+	{id: 3, title: 'Task 4', parentColumnId: 1},
+	{id: 4, title: 'Task 5', parentColumnId: 1},
+	{id: 5, title: 'Task 6', parentColumnId: 1},
+	{id: 6, title: 'Task 7', parentColumnId: 2},
+	{id: 7, title: 'Task 8', parentColumnId: 2},
+	{id: 8, title: 'Task 9', parentColumnId: 2}
 
 ];
 
-const lists = [
+const columns = [
 
 	{id: 0, title: 'Task today', order: 0},
 	{id: 1, title: 'Tomorrow', order: 1},
@@ -50,12 +50,12 @@ const lists = [
 ];
 
 const groupedTasksByParent = tasks.reduce((acc, task) => {
-	const {parentListId} = task;
+	const {parentColumnId} = task;
 
-	if (!acc.has(parentListId)) {
-		acc.set(parentListId, []);
+	if (!acc.has(parentColumnId)) {
+		acc.set(parentColumnId, []);
 	}
-	acc.get(parentListId).push(task);
+	acc.get(parentColumnId).push(task);
 	return acc;
 }, new Map());
 
@@ -63,47 +63,47 @@ if (dashboard) {
 
 	const createComponents = () => {
 
-		lists.forEach((list) => {
-			const {id} = list;
-			const taskInList: TaskType[] = groupedTasksByParent.get(id);
+		columns.forEach((column) => {
+			const {id} = column;
+			const taskInColumn: TaskType[] = groupedTasksByParent.get(id);
 
-			const listComponent = new List(list);
+			const columnComponent = new Column(column);
 
-			taskInList.forEach((item) => {
-				const task = listComponent.appendTask(item);
+			taskInColumn.forEach((item) => {
+				const task = columnComponent.appendTask(item);
 				domTasksMap.set(item.id, task);
 			});
 
-			domListsMap.set(id, listComponent);
-			dashboard.appendChild(listComponent);
+			domColumnsMap.set(id, columnComponent);
+			dashboard.appendChild(columnComponent);
 
 		});
 	};
 
 	createComponents();
 
-	dashboard.addEventListener(LIST_TOOLS_EVENTS.REMOVE_LIST, (evt) => {
+	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.REMOVE_COLUMN, (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
-		const listId = Number(detail.id || (evt.target as List).id);
-		console.log('listId ', listId);
+		const columnId = Number(detail.id || (evt.target as Column).id);
+		console.log('columnId ', columnId);
 
 	});
 
-	dashboard.addEventListener(LIST_TOOLS_EVENTS.EDIT_LIST, (evt) => {
+	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, (evt) => {
 
-		const listId = Number((evt.target as List).id);
-		const currenList = lists.find(list => list.id === listId);
+		const columnId = Number((evt.target as Column).id);
+		const currenList = columns.find(column => column.id === columnId);
 
-		domListsMap.get(listId).setAttribute('title', 'Edit');
-		useListForm(currenList).showListForm();
+		domColumnsMap.get(columnId).setAttribute('title', 'Edit');
+		useColumnForm(currenList).showColumnForm();
 
 	});
 
-	dashboard.addEventListener(LIST_TOOLS_EVENTS.ADD_TASK, (evt) => {
+	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, (evt) => {
 		//получаем id листа, в котором добавить таску
-		console.log('add-task custom event id: ', (evt.target as List).id);
+		console.log('add-task custom event id: ', (evt.target as Column).id);
 	});
 
 	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, (evt) => {

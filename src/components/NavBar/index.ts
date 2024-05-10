@@ -1,20 +1,12 @@
-import {useColumnForm} from './useColumnForm.ts';
-import {dashboard} from '../dashboard';
-import Column from '../dashboard/Column/Column.ts';
-
-const {showColumnForm} = useColumnForm();
-const addColumnButton = document.querySelector<HTMLButtonElement>('#add-column-btn');
-
+// import {useTaskForm} from './useTaskForm.ts';
+// import {useColumnForm} from './useColumnForm.ts';
+//
+// const {showTaskForm} = useTaskForm();
+// const {showColumnForm} = useColumnForm();
+//
+// const addColumnButton = document.querySelector<HTMLButtonElement>('#add-column-btn');
+// const addTaskButton = document.querySelector<HTMLButtonElement>('#add-new-task');
 export const modal = document.getElementById('modal') as HTMLDialogElement;
 
-addColumnButton?.addEventListener('click', async () => {
-
-	try {
-
-		const newColumn = new Column(await showColumnForm());
-		dashboard?.append(newColumn);
-
-	} catch (e) {
-		console.log('add new list rejected ', e);
-	}
-});
+// addListButton?.addEventListener('click', showListForm);
+// addTaskButton?.addEventListener('click', showTaskForm);

@@ -113,7 +113,7 @@ export default class Column extends HTMLElement {
 		return ['title'];
 	}
 
-	attributeChangedCallback(attribute: string) {
+	attributeChangedCallback(attribute: string,) {
 
 		let currentValue;
 
@@ -124,7 +124,7 @@ export default class Column extends HTMLElement {
 			if (this.title === currentValue) return;
 
 			this.title = currentValue;
-			this.columnTitle.textContent = this.title;
+			this.buildTemplate();
 		}
 	}
 

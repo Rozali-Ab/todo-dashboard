@@ -1,7 +1,7 @@
-export const LIST_TOOLS_EVENTS = {
+export const COLUMN_TOOLS_EVENTS = {
 	ADD_TASK: 'add-task',
-	EDIT_LIST: 'edit-list',
-	REMOVE_LIST: 'remove-list'
+	EDIT_COLUMN: 'edit-column',
+	REMOVE_COLUMN: 'remove-column'
 };
 
 export const TASK_TOOLS_EVENTS = {

@@ -8,13 +8,13 @@ export default class Task extends HTMLElement {
 	taskTitle = document.createElement('div');
 	taskTools = document.createElement('div');
 
-	constructor({id, title, parentListId}: TaskType) {
+	constructor({id, title, parentColumnId}: TaskType) {
 
 		super();
 
 		this.id = id.toString();
 		this.title = title;
-		this.parent = parentListId.toString();
+		this.parent = parentColumnId.toString();
 
 		this.setTaskAttributes();
 	}
