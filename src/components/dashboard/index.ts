@@ -22,9 +22,10 @@ const {
 	onTouchEnd
 } = useTouchDnD();
 
-const dashboard = document.querySelector<HTMLElement>('#dashboard');
+const dashboard = document.getElementById('dashboard');
 
 const domListsMap = new Map();
+const domTasksMap = new Map();
 
 const tasks = [
 
@@ -64,9 +65,14 @@ if (dashboard) {
 
 		lists.forEach((list) => {
 			const {id} = list;
-			const taskInList: TaskType | TaskType[] = groupedTasksByParent.get(id);
+			const taskInList: TaskType[] = groupedTasksByParent.get(id);
 
-			const listComponent = taskInList ? new List({list, tasks: taskInList}) : new List({list});
+			const listComponent = new List(list);
+
+			taskInList.forEach((item) => {
+				const task = listComponent.appendTask(item);
+				domTasksMap.set(item.id, task);
+			});
 
 			domListsMap.set(id, listComponent);
 			dashboard.appendChild(listComponent);
