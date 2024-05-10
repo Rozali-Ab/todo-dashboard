@@ -1,4 +1,4 @@
-export type ListType = {
+export type ColumnType = {
 	id: number;
 	title: string;
 	order: number;
@@ -7,5 +7,5 @@ export type ListType = {
 export type TaskType = {
 	id: number;
 	title: string;
-	parentListId: number;
+	parentColumnId: number;
 }

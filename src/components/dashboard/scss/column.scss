@@ -1,4 +1,4 @@
-.task-list {
+.column-component {
   @include shadow-box;
   @include fd-column;
 
@@ -22,17 +22,17 @@
   }
 }
 
-.list-tools {
+.column-tools {
   display: flex;
   justify-content: flex-end;
 }
 
-.task-list.remove {
+.column-component.remove {
   user-select: none;
-  animation: remove-list .5s ease;
+  animation: remove-column .5s ease;
 }
 
-@keyframes remove-list {
+@keyframes remove-column {
   0% {
     opacity: 1;
   }

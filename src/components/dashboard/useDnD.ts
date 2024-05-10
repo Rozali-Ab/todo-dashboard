@@ -1,6 +1,6 @@
 //import {useTasksStore} from '../../store/useTasksStore.ts';
 import Task from './Task/Task.ts';
-import List from './List/List.ts';
+import Column from './Column/Column.ts';
 
 export const useDnD = () => {
 	//const {updateTaskParentIdById} = useTasksStore();
@@ -23,11 +23,11 @@ export const useDnD = () => {
 		const target = evt.target as Task;
 		if (!target) return;
 
-		const list = target.closest('.task-list') as List;
-		if (!list) return;
+		const column = target.closest('.column-component') as Column;
+		if (!column) return;
 
-		if (list.children.length === 0) {
-			list.appendChild(draggingTask);
+		if (column.children.length === 0) {
+			column.appendChild(draggingTask);
 			return;
 		}
 
@@ -35,18 +35,18 @@ export const useDnD = () => {
 		const offsetY = evt.clientY - targetRect.top;
 
 		if (offsetY > targetRect.height / 2) {
-			target.nextSibling ? list.insertBefore(draggingTask, target.nextSibling) : list.appendChild(draggingTask);
+			target.nextSibling ? column.insertBefore(draggingTask, target.nextSibling) : column.appendChild(draggingTask);
 			return;
 		}
 
-		list.insertBefore(draggingTask, target);
+		column.insertBefore(draggingTask, target);
 
 	};
 
 	const onDragEnd = () => {
 		if (draggingTask) {
 			draggingTask.style.opacity = '';
-			draggingTask.setAttribute('parent', (draggingTask.parentNode as List).id);
+			draggingTask.setAttribute('parent', (draggingTask.parentNode as Column).id);
 		}
 	};
 

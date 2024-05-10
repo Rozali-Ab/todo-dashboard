@@ -1,10 +1,10 @@
 // import {useTaskForm} from './useTaskForm.ts';
-// import {useListForm} from './useListForm.ts';
+// import {useColumnForm} from './useColumnForm.ts';
 //
 // const {showTaskForm} = useTaskForm();
-// const {showListForm} = useListForm();
+// const {showColumnForm} = useColumnForm();
 //
-// const addListButton = document.querySelector<HTMLButtonElement>('#add-list-btn');
+// const addColumnButton = document.querySelector<HTMLButtonElement>('#add-column-btn');
 // const addTaskButton = document.querySelector<HTMLButtonElement>('#add-new-task');
 export const modal = document.getElementById('modal') as HTMLDialogElement;
 
