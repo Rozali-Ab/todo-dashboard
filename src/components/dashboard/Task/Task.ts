@@ -114,21 +114,23 @@ export default class Task extends HTMLElement {
 
 		if (attribute === 'title') {
 
-			currentValue = this.getAttribute(attribute)!;
+			currentValue = this.getAttribute(attribute);
 
 			if (this.title === currentValue) return;
 
-			this.title = currentValue;
-			this.buildTemplate();
+			if (currentValue)
+				this.title = currentValue;
+			this.taskTitle.textContent = this.title;
 		}
 
 		if (attribute === 'parent') {
 
-			currentValue = this.getAttribute(attribute)!;
+			currentValue = this.getAttribute(attribute);
 
 			if (this.parent === currentValue) return;
-			this.parent = currentValue;
-			this.buildTemplate();
+
+			if (currentValue)
+				this.parent = currentValue;
 		}
 
 		console.log('attributeChangedCallback');

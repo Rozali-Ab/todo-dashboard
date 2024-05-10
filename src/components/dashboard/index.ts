@@ -101,22 +101,39 @@ if (dashboard) {
 
 	});
 
-	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, (evt) => {
+	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, async (evt) => {
 		//получаем id листа, в котором добавить таску
-		console.log('add-task custom event id: ', (evt.target as Column).id);
+		const {detail} = evt as CustomEvent;
+		const columnId = Number(detail.id || (evt.target as Column).id);
+
+		try {
+			const currentColumn = domColumnsMap.get(columnId);
+			const {showTaskForm} = useTaskForm({parentColumnId: columnId});
+
+			const newTask = await showTaskForm();
+			currentColumn.appendTask(newTask);
+		} catch (e) {
+			console.log('add task reject ', e);
+		}
 	});
 
-	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, (evt) => {
+	dashboard.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, async (evt) => {
 
 		const {detail} = evt as CustomEvent;
 
 		const taskId = Number(detail.id || (evt.target as Task).id);
 
-		(evt.target as Task).setAttribute('title', 'edited');
-
 		const currentTask = tasks.find(task => task.id === Number(taskId));
 
-		useTaskForm(currentTask).showTaskForm();
+		const {showTaskForm} = useTaskForm(currentTask);
+
+		try {
+			const updatedTask: TaskType = await showTaskForm();
+
+			domTasksMap.get(taskId).setAttribute('title', updatedTask.title);
+		} catch (e) {
+			console.log('edit task reject ', e);
+		}
 
 	});
 
