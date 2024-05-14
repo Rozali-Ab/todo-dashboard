@@ -20,26 +20,28 @@ export const useDnD = () => {
 
 	const onDragOver = (evt: DragEvent) => {
 
-		const target = evt.target as Task;
-		if (!target) return;
+		const target = evt.target;
+		//if (!target) return;
 
-		const column = target.closest('.column-component') as Column;
-		if (!column) return;
+		if (target instanceof Task) {
+			const column = target.closest('.column-component') as Column;
+			if (!column) return;
 
-		if (column.children.length === 0) {
-			column.appendChild(draggingTask);
-			return;
+			if (column.children.length === 0) {
+				column.appendChild(draggingTask);
+				return;
+			}
+
+			const targetRect = target.getBoundingClientRect();
+			const offsetY = evt.clientY - targetRect.top;
+
+			if (offsetY > targetRect.height / 2) {
+				target.nextSibling ? column.insertBefore(draggingTask, target.nextSibling) : column.appendChild(draggingTask);
+				return;
+			}
+
+			column.insertBefore(draggingTask, target);
 		}
-
-		const targetRect = target.getBoundingClientRect();
-		const offsetY = evt.clientY - targetRect.top;
-
-		if (offsetY > targetRect.height / 2) {
-			target.nextSibling ? column.insertBefore(draggingTask, target.nextSibling) : column.appendChild(draggingTask);
-			return;
-		}
-
-		column.insertBefore(draggingTask, target);
 
 	};
 
