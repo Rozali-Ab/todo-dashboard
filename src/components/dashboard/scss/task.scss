@@ -61,6 +61,16 @@
       }
     }
   }
+
+  &--drag-target {
+    opacity: 0;
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+    font-size: 0;
+    user-select: none;
+    cursor: grabbing;
+  }
 }
 
 .task.remove {
@@ -70,17 +80,11 @@
 
 @keyframes remove-task {
   0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  20% {
-    opacity: .7;
-    transform: scale(.7);
+    opacity: .5;
   }
 
   100% {
-    opacity: .7;
-    transform: translateX(2000px) scale(.7);
+    transform: translateX(2000px);
+    opacity: 0;
   }
 }

@@ -1,3 +1,11 @@
+nav-bar {
+  display: flex;
+  @include fd-row;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
 #add-column-btn, #add-new-task {
   height: 60px;
   width: 30rem;
