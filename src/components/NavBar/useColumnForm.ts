@@ -1,8 +1,9 @@
 import {modal} from './index.ts';
 import type {ColumnType} from '../../store/types/types.ts';
 import {getFormData} from './utils/getFormData.ts';
+import {useTasksStore} from '../../store/useTasksStore.ts';
 
-//const {createColumn} = useTasksStore();
+const {createColumn, updateColumnById} = useTasksStore();
 
 const formTemplate = ({title}: ColumnType) => {
 	const isNew = title === '' ? 'New' : '';
@@ -40,7 +41,7 @@ const emptyColumn: ColumnType = {
 
 export const useColumnForm = (columnPayload?: ColumnType) => {
 
-	const columnToUse = Object.assign(emptyColumn, columnPayload);
+	const columnToUse = Object.assign({}, emptyColumn, columnPayload);
 
 	const showColumnForm = async (): Promise<ColumnType> => {
 
@@ -50,18 +51,24 @@ export const useColumnForm = (columnPayload?: ColumnType) => {
 		return new Promise((resolve, reject) => {
 
 			form.addEventListener('submit', (evt) => {
+
+				closeModal();
+				form.remove();
+
 				return resolve(onSubmitForm(evt));
 			});
 
 			const cancelButton = document.getElementById('cancel-column');
 			cancelButton?.addEventListener('click', () => {
-				removeForm();
-				reject();
+				closeModal();
+				form.remove();
+
+				return reject();
 			});
 		});
 	};
 
-	const removeForm = () => {
+	const closeModal = () => {
 		modal.innerHTML = '';
 		modal.close();
 	};
@@ -70,10 +77,16 @@ export const useColumnForm = (columnPayload?: ColumnType) => {
 		evt.preventDefault();
 
 		const formNode = evt.target as HTMLFormElement;
+		const titleInput = getFormData(formNode).title;
 
-		columnToUse.title = getFormData(formNode).title;
+		if (!columnToUse.title) {
 
-		removeForm();
+			return createColumn(titleInput);
+		}
+
+		columnToUse.title = titleInput;
+		updateColumnById(columnToUse);
+
 		return columnToUse;
 	};
 

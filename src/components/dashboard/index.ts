@@ -1,11 +1,14 @@
 import Column from './Column/Column';
 import Task from './Task/Task';
-import {useDnD} from './useDnD.ts';
+import {useTasksStore} from '../../store/useTasksStore.ts';
 import {useTaskForm} from '../NavBar/useTaskForm.ts';
 import {useColumnForm} from '../NavBar/useColumnForm.ts';
 import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
 import type {TaskType} from '../../store/types/types.ts';
 import {useTouchDnD} from './useTouchDnD.ts';
+import {useDnD} from './useDnD.ts';
+
+const {tasks, columns, removeColumnById, removeTaskById, removeAllTasksByParentId} = useTasksStore();
 
 customElements.define('column-component', Column);
 customElements.define('task-component', Task);
@@ -24,30 +27,8 @@ const {
 
 export const dashboard = document.getElementById('dashboard');
 
-const domColumnsMap = new Map();
+export const domColumnsMap = new Map();
 const domTasksMap = new Map();
-
-const tasks = [
-
-	{id: 0, title: 'Task 1', parentColumnId: 0},
-	{id: 1, title: 'Task 2', parentColumnId: 0},
-	{id: 2, title: 'Task 3', parentColumnId: 0},
-	{id: 3, title: 'Task 4', parentColumnId: 1},
-	{id: 4, title: 'Task 5', parentColumnId: 1},
-	{id: 5, title: 'Task 6', parentColumnId: 1},
-	{id: 6, title: 'Task 7', parentColumnId: 2},
-	{id: 7, title: 'Task 8', parentColumnId: 2},
-	{id: 8, title: 'Task 9', parentColumnId: 2}
-
-];
-
-const columns = [
-
-	{id: 0, title: 'Task today', order: 0},
-	{id: 1, title: 'Tomorrow', order: 1},
-	{id: 2, title: 'Then', order: 2}
-
-];
 
 const groupedTasksByParent = tasks.reduce((acc, task) => {
 	const {parentColumnId} = task;
@@ -69,10 +50,12 @@ if (dashboard) {
 
 			const columnComponent = new Column(column);
 
-			taskInColumn.forEach((item) => {
-				const task = columnComponent.appendTask(item);
-				domTasksMap.set(item.id, task);
-			});
+			if (taskInColumn) {
+				taskInColumn.forEach((item) => {
+					const task = columnComponent.appendTask(item);
+					domTasksMap.set(item.id, task);
+				});
+			}
 
 			domColumnsMap.set(id, columnComponent);
 			dashboard.appendChild(columnComponent);
@@ -87,22 +70,30 @@ if (dashboard) {
 		const {detail} = evt as CustomEvent;
 
 		const columnId = Number(detail.id || (evt.target as Column).id);
-		console.log('columnId ', columnId);
 
+		removeColumnById(columnId);
+
+		if (!detail.isEmpty) {
+			removeAllTasksByParentId(columnId);
+		}
 	});
 
 	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, async (evt) => {
 
-		const columnId = Number((evt.target as Column).id);
-		const currenList = columns.find(column => column.id === columnId);
+		const {detail} = evt as CustomEvent;
 
-		const {showColumnForm} = useColumnForm(currenList);
+		const columnId = Number(detail.id || (evt.target as Column).id);
+
+		const currentColumnInStore = columns.find(column => column.id === columnId);
+
+		const {showColumnForm} = useColumnForm(currentColumnInStore);
 
 		try {
 
 			const updatedColumn = await showColumnForm();
 
-			domColumnsMap.get(columnId).setAttribute('title', updatedColumn.title);
+			domColumnsMap.get(columnId).updateColumnTitle(updatedColumn);
+
 		} catch (e) {
 			console.log('edit column rejected ', e);
 		}
@@ -110,16 +101,20 @@ if (dashboard) {
 	});
 
 	dashboard.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, async (evt) => {
-		//получаем id листа, в котором добавить таску
+
 		const {detail} = evt as CustomEvent;
 		const columnId = Number(detail.id || (evt.target as Column).id);
 
+		const currentColumn = domColumnsMap.get(columnId);
+
 		try {
-			const currentColumn = domColumnsMap.get(columnId);
+
 			const {showTaskForm} = useTaskForm({parentColumnId: columnId});
 
 			const newTask = await showTaskForm();
-			currentColumn.appendTask(newTask);
+
+			domTasksMap.set(newTask.id, currentColumn.appendTask(newTask));
+
 		} catch (e) {
 			console.log('add task reject ', e);
 		}
@@ -131,14 +126,14 @@ if (dashboard) {
 
 		const taskId = Number(detail.id || (evt.target as Task).id);
 
-		const currentTask = tasks.find(task => task.id === Number(taskId));
-
-		const {showTaskForm} = useTaskForm(currentTask);
+		const currentTaskInStore = tasks.find(task => task.id === Number(taskId));
 
 		try {
+			const {showTaskForm} = useTaskForm(currentTaskInStore);
 			const updatedTask: TaskType = await showTaskForm();
 
-			domTasksMap.get(taskId).setAttribute('title', updatedTask.title);
+			domTasksMap.get(taskId).updateTaskTitle(updatedTask);
+
 		} catch (e) {
 			console.log('edit task reject ', e);
 		}
@@ -150,7 +145,8 @@ if (dashboard) {
 		const {detail} = evt as CustomEvent;
 
 		const taskId = Number(detail.id || (evt.target as Task).id);
-		console.log('taskId ', taskId);
+
+		removeTaskById(taskId);
 
 	});
 

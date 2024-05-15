@@ -1,10 +1,9 @@
-//import {useTasksStore} from '../../store/useTasksStore.ts';
+import {useTasksStore} from '../../store/useTasksStore.ts';
 import {getFormData} from './utils/getFormData.ts';
-//import {Task} from '../dashboard/Task/Task.ts';
 import {modal} from './index.ts';
 import type {TaskType} from '../../store/types/types.ts';
 
-//const {createTask} = useTasksStore();
+const {createTask, updateTaskTitle} = useTasksStore();
 
 const formTemplate = ({title}: TaskType) => {
 	const isNew = title === '' ? 'New' : '';
@@ -44,7 +43,7 @@ const emptyTask: TaskType = {
 
 export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
 
-	const taskToUse = Object.assign(emptyTask, taskPayload);
+	const taskToUse = Object.assign({}, emptyTask, taskPayload);
 
 	const showTaskForm = async (): Promise<TaskType> => {
 
@@ -54,19 +53,22 @@ export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
 
 		return new Promise((resolve, reject) => {
 			form.addEventListener('submit', (evt) => {
+				closeModal();
+				form.remove();
 				return resolve(onSubmitForm(evt));
 			});
 
 			const cancelButton = document.getElementById('cancel-task');
 			cancelButton?.addEventListener('click', () => {
-				removeForm();
-				reject();
+				closeModal();
+				form.remove();
+				return reject();
 			});
 		});
 
 	};
 
-	const removeForm = () => {
+	const closeModal = () => {
 		modal.close();
 		modal.innerHTML = '';
 	};
@@ -75,10 +77,16 @@ export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
 		evt.preventDefault();
 
 		const formNode = evt.target as HTMLFormElement;
+		const titleInput = getFormData(formNode).title;
 
-		taskToUse.title = getFormData(formNode).title;
-		//CREATE TASK IN STORE
-		removeForm();
+		if (!taskToUse.title) {
+
+			return createTask(titleInput, taskToUse.parentColumnId);
+		}
+
+		taskToUse.title = titleInput;
+		updateTaskTitle(taskToUse);
+
 		return taskToUse;
 	};
 

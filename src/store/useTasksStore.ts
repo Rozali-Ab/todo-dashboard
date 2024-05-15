@@ -24,11 +24,11 @@ export const useTasksStore = () => {
 		setToLocalStorage(LOCAL_STORAGE_KEYS.COLUMNS, columns);
 	};
 
-	const createTask = (title: string) => {
+	const createTask = (title: string, parentColumnId: number) => {
 		const task: TaskType = {
-			id: tasks.length,
+			id: Date.now(),
 			title: title,
-			parentColumnId: 0,
+			parentColumnId: parentColumnId,
 		};
 		tasks.push(task);
 		saveTasks();
@@ -39,10 +39,11 @@ export const useTasksStore = () => {
 	const createColumn = (title: string) => {
 
 		const column: ColumnType = {
-			id: columns.length,
+			id: Date.now(),
 			title: title,
 			order: columns.length
 		};
+
 		columns.push(column);
 		saveColumns();
 		return column;

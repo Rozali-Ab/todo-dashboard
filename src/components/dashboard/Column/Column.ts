@@ -25,7 +25,7 @@ export default class Column extends HTMLElement {
 	setColumnAttributes() {
 
 		this.setAttribute('id', this.id);
-		this.setAttribute('title', this.title);
+		//this.setAttribute('title', this.title);
 	}
 
 	getColumnAttributes() {
@@ -33,9 +33,9 @@ export default class Column extends HTMLElement {
 			this.id = this.getAttribute('id')!;
 		}
 
-		if (!this.title) {
-			this.title = this.getAttribute('title')!;
-		}
+		/*		if (!this.title) {
+					this.title = this.getAttribute('title')!;
+				}*/
 	}
 
 	connectedCallback() {
@@ -66,8 +66,8 @@ export default class Column extends HTMLElement {
 		this.columnTools.classList.add('column-tools');
 		this.columnTools.innerHTML = `
       <button class="column-tools__add" data-action-type=${COLUMN_TOOLS_EVENTS.ADD_TASK}>add task</button>
-      <button class="column-tools__rename" data-action-type=${COLUMN_TOOLS_EVENTS.EDIT_COLUMN}>edit column</button>
-      <button class="column-tools__remove" data-action-type=${COLUMN_TOOLS_EVENTS.REMOVE_COLUMN}>delete column</button>
+      <button class="column-tools__rename" data-action-type=${COLUMN_TOOLS_EVENTS.EDIT_COLUMN}>edit</button>
+      <button class="column-tools__remove" data-action-type=${COLUMN_TOOLS_EVENTS.REMOVE_COLUMN}>remove</button>
 		`;
 
 		this.columnTitle.textContent = this.title;
@@ -85,13 +85,24 @@ export default class Column extends HTMLElement {
 		if (!currentAction || !Object.values(COLUMN_TOOLS_EVENTS).includes(currentAction)) return;
 
 		const {id} = this;
+		const isEmpty = this.taskArray.length === 0;
 
 		const event = new CustomEvent(currentAction, {
 			bubbles: true,
-			detail: {id}
+			detail: {id, isEmpty}
 		});
 
 		if (currentAction === COLUMN_TOOLS_EVENTS.REMOVE_COLUMN) {
+
+			if (this.taskArray.length > 0) {
+				const confirmed = window.confirm('Remove Column with all tasks?');
+				if (confirmed) {
+					this.removeColumn();
+					this.dispatchEvent(event);
+					return;
+				}
+				return;
+			}
 			this.removeColumn();
 		}
 
@@ -106,26 +117,31 @@ export default class Column extends HTMLElement {
 		}, 500);
 	}
 
-	/**
-		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
-	 */
-	static get observedAttributes() {
-		return ['title'];
+	updateColumnTitle(payload: ColumnType) {
+		this.title = payload.title;
+		this.columnTitle.textContent = this.title;
 	}
 
-	attributeChangedCallback(attribute: string) {
-
-		let currentValue;
-
-		if (attribute === 'title') {
-
-			currentValue = this.getAttribute(attribute)!;
-
-			if (this.title === currentValue) return;
-
-			this.title = currentValue;
-			this.columnTitle.textContent = this.title;
+	/*	/!**
+			следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
+		 *!/
+		static get observedAttributes() {
+			return ['title'];
 		}
-	}
+
+		attributeChangedCallback(attribute: string) {
+
+			let currentValue;
+
+			if (attribute === 'title') {
+
+				currentValue = this.getAttribute(attribute)!;
+
+				if (this.title === currentValue) return;
+
+				this.title = currentValue;
+				this.columnTitle.textContent = this.title;
+			}
+		}*/
 
 }

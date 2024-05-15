@@ -1,5 +1,5 @@
-import {TaskType} from '../../../store/types/types.ts';
 import {TASK_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
+import type {TaskType} from '../../../store/types/types.ts';
 
 export default class Task extends HTMLElement {
 	id = '';
@@ -25,8 +25,8 @@ export default class Task extends HTMLElement {
 	setTaskAttributes() {
 
 		this.setAttribute('id', this.id);
-		this.setAttribute('title', this.title);
-		this.setAttribute('parent', this.parent);
+		// this.setAttribute('title', this.title);
+		// this.setAttribute('parent', this.parent);
 		this.setAttribute('draggable', 'true');
 	}
 
@@ -34,14 +34,14 @@ export default class Task extends HTMLElement {
 		if (!this.id) {
 			this.id = this.getAttribute('id')!;
 		}
-
-		if (!this.title) {
-			this.title = this.getAttribute('title')!;
-		}
-
-		if (!this.parent) {
-			this.parent = this.getAttribute('parent')!;
-		}
+		//
+		// if (!this.title) {
+		// 	this.title = this.getAttribute('title')!;
+		// }
+		//
+		// if (!this.parent) {
+		// 	this.parent = this.getAttribute('parent')!;
+		// }
 	}
 
 	connectedCallback() {
@@ -100,40 +100,50 @@ export default class Task extends HTMLElement {
 		}, 300);
 	}
 
-	/**
-		следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
-	 */
-	static get observedAttributes() {
-
-		return ['title', 'parent'];
+	updateTaskTitle(payload: TaskType) {
+		this.title = payload.title;
+		this.taskTitle.textContent = this.title;
 	}
 
-	attributeChangedCallback(attribute: string) {
-
-		let currentValue;
-
-		if (attribute === 'title') {
-
-			currentValue = this.getAttribute(attribute);
-
-			if (this.title === currentValue) return;
-
-			if (currentValue)
-				this.title = currentValue;
-			this.taskTitle.textContent = this.title;
-		}
-
-		if (attribute === 'parent') {
-
-			currentValue = this.getAttribute(attribute);
-
-			if (this.parent === currentValue) return;
-
-			if (currentValue)
-				this.parent = currentValue;
-		}
-
-		console.log('attributeChangedCallback');
+	updateTaskParent(newParentId: string) {
+		this.parent = newParentId;
 	}
+
+	/*
+		/!**
+			следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
+		 *!/
+		static get observedAttributes() {
+
+			return ['title', 'parent'];
+		}
+
+		attributeChangedCallback(attribute: string) {
+
+			let currentValue;
+
+			if (attribute === 'title') {
+
+				currentValue = this.getAttribute(attribute);
+
+				if (this.title === currentValue) return;
+
+				if (currentValue)
+					this.title = currentValue;
+				this.taskTitle.textContent = this.title;
+			}
+
+			if (attribute === 'parent') {
+
+				currentValue = this.getAttribute(attribute);
+
+				if (this.parent === currentValue) return;
+
+				if (currentValue)
+					this.parent = currentValue;
+			}
+
+			console.log('attributeChangedCallback');
+		}*/
 
 }
