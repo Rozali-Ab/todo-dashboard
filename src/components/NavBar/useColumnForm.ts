@@ -1,7 +1,7 @@
-import {modal} from './index.ts';
-import type {ColumnType} from '../../store/types/types.ts';
 import {getFormData} from './utils/getFormData.ts';
 import {useTasksStore} from '../../store/useTasksStore.ts';
+import AppModal from '../AppModal/AppModal.ts';
+import type {ColumnType} from '../../store/types/types.ts';
 
 const {createColumn, updateColumnById} = useTasksStore();
 
@@ -29,7 +29,6 @@ const formTemplate = ({title}: ColumnType) => {
         <button class="submit" type="submit" id="submit-column">Save</button>
     </div>
 	`;
-	modal.append(form);
 	return form;
 };
 
@@ -41,36 +40,32 @@ const emptyColumn: ColumnType = {
 
 export const useColumnForm = (columnPayload?: ColumnType) => {
 
-	const columnToUse = Object.assign({}, emptyColumn, columnPayload);
+	const columnToUse = {...emptyColumn, ...columnPayload};
 
 	const showColumnForm = async (): Promise<ColumnType> => {
 
+		const modal = new AppModal();
+
 		const form = formTemplate(columnToUse);
-		modal.showModal();
+		modal.appendContent(form);
+		modal.open();
 
 		return new Promise((resolve, reject) => {
 
 			form.addEventListener('submit', (evt) => {
 
-				closeModal();
-				form.remove();
+				modal.close();
 
 				return resolve(onSubmitForm(evt));
 			});
 
 			const cancelButton = document.getElementById('cancel-column');
 			cancelButton?.addEventListener('click', () => {
-				closeModal();
-				form.remove();
+				modal.close();
 
 				return reject();
 			});
 		});
-	};
-
-	const closeModal = () => {
-		modal.innerHTML = '';
-		modal.close();
 	};
 
 	const onSubmitForm = (evt: SubmitEvent) => {

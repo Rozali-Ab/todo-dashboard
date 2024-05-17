@@ -47,3 +47,10 @@
   }
 
 }
+
+.modal-message {
+  @include shadow-box;
+  width: 300px;
+  padding: 1em;
+  border-radius: $radius;
+}

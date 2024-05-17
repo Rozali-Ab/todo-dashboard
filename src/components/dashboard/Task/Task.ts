@@ -19,14 +19,9 @@ export default class Task extends HTMLElement {
 		this.setTaskAttributes();
 	}
 
-	/**
- в конструкторе устанавливаем атрибуты
-	 */
 	setTaskAttributes() {
 
 		this.setAttribute('id', this.id);
-		// this.setAttribute('title', this.title);
-		// this.setAttribute('parent', this.parent);
 		this.setAttribute('draggable', 'true');
 	}
 
@@ -34,18 +29,9 @@ export default class Task extends HTMLElement {
 		if (!this.id) {
 			this.id = this.getAttribute('id')!;
 		}
-		//
-		// if (!this.title) {
-		// 	this.title = this.getAttribute('title')!;
-		// }
-		//
-		// if (!this.parent) {
-		// 	this.parent = this.getAttribute('parent')!;
-		// }
 	}
 
 	connectedCallback() {
-		//mounted
 
 		this.getTaskAttributes();
 		this.buildTemplate();
@@ -108,42 +94,5 @@ export default class Task extends HTMLElement {
 	updateTaskParent(newParentId: string) {
 		this.parent = newParentId;
 	}
-
-	/*
-		/!**
-			следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
-		 *!/
-		static get observedAttributes() {
-
-			return ['title', 'parent'];
-		}
-
-		attributeChangedCallback(attribute: string) {
-
-			let currentValue;
-
-			if (attribute === 'title') {
-
-				currentValue = this.getAttribute(attribute);
-
-				if (this.title === currentValue) return;
-
-				if (currentValue)
-					this.title = currentValue;
-				this.taskTitle.textContent = this.title;
-			}
-
-			if (attribute === 'parent') {
-
-				currentValue = this.getAttribute(attribute);
-
-				if (this.parent === currentValue) return;
-
-				if (currentValue)
-					this.parent = currentValue;
-			}
-
-			console.log('attributeChangedCallback');
-		}*/
 
 }

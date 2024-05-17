@@ -1,6 +1,7 @@
-import {ColumnType, TaskType} from '../../../store/types/types.ts';
 import Task from '../Task/Task.ts';
-import {COLUMN_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
+import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
+import type {ColumnType, TaskType} from '../../../store/types/types.ts';
+import {confirmDeleteColumn} from './utils/confirmDeleteColumn.ts';
 
 export default class Column extends HTMLElement {
 	id = '';
@@ -9,6 +10,7 @@ export default class Column extends HTMLElement {
 	columnTools = document.createElement('div');
 	columnHeader = document.createElement('div');
 	columnTitle = document.createElement('div');
+	columnBody = document.createElement('div');
 
 	constructor({id, title}: ColumnType) {
 
@@ -19,13 +21,8 @@ export default class Column extends HTMLElement {
 		this.setColumnAttributes();
 	}
 
-	/**
-  в конструкторе устанавливаем атрибуты
-	 */
 	setColumnAttributes() {
-
 		this.setAttribute('id', this.id);
-		//this.setAttribute('title', this.title);
 	}
 
 	getColumnAttributes() {
@@ -33,17 +30,14 @@ export default class Column extends HTMLElement {
 			this.id = this.getAttribute('id')!;
 		}
 
-		/*		if (!this.title) {
-					this.title = this.getAttribute('title')!;
-				}*/
 	}
 
 	connectedCallback() {
-		//mounted
 
 		this.getColumnAttributes();
 		this.buildTemplate();
 		this.columnTools.addEventListener('click', this.onColumnToolsClick.bind(this));
+		this.columnBody.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => this.removeTask(evt as CustomEvent));
 
 	}
 
@@ -52,9 +46,17 @@ export default class Column extends HTMLElement {
 		this.taskArray.push(task);
 
 		const taskComponent = new Task(task);
-		this.append(taskComponent);
+		this.columnBody.append(taskComponent);
 
 		return taskComponent;
+	}
+
+	removeTask(evt: CustomEvent) {
+
+		const taskId = Number(evt.detail.id);
+
+		const index = this.taskArray.findIndex((task) => task.id === taskId);
+		this.taskArray.splice(index, 1);
 	}
 
 	buildTemplate() {
@@ -62,6 +64,7 @@ export default class Column extends HTMLElement {
 		this.classList.add('column-component');
 		this.columnHeader.classList.add('column-component-header');
 		this.columnTitle.classList.add('column-component-title');
+		this.columnBody.classList.add('column-component-body');
 
 		this.columnTools.classList.add('column-tools');
 		this.columnTools.innerHTML = `
@@ -75,10 +78,10 @@ export default class Column extends HTMLElement {
 		this.columnHeader.append(this.columnTitle);
 
 		this.prepend(this.columnHeader);
-
+		this.append(this.columnBody);
 	}
 
-	onColumnToolsClick(evt: MouseEvent) {
+	async onColumnToolsClick(evt: MouseEvent) {
 
 		const currentAction = (evt.target as HTMLElement).dataset.actionType;
 
@@ -95,7 +98,9 @@ export default class Column extends HTMLElement {
 		if (currentAction === COLUMN_TOOLS_EVENTS.REMOVE_COLUMN) {
 
 			if (this.taskArray.length > 0) {
-				const confirmed = window.confirm('Remove Column with all tasks?');
+
+				const confirmed = await confirmDeleteColumn();
+
 				if (confirmed) {
 					this.removeColumn();
 					this.dispatchEvent(event);
@@ -114,34 +119,12 @@ export default class Column extends HTMLElement {
 
 		setTimeout(() => {
 			this.remove();
-		}, 500);
+		}, 300);
 	}
 
 	updateColumnTitle(payload: ColumnType) {
 		this.title = payload.title;
 		this.columnTitle.textContent = this.title;
 	}
-
-	/*	/!**
-			следит за изменениями атрибутов и вызывает attributeChangedCallback при изменении
-		 *!/
-		static get observedAttributes() {
-			return ['title'];
-		}
-
-		attributeChangedCallback(attribute: string) {
-
-			let currentValue;
-
-			if (attribute === 'title') {
-
-				currentValue = this.getAttribute(attribute)!;
-
-				if (this.title === currentValue) return;
-
-				this.title = currentValue;
-				this.columnTitle.textContent = this.title;
-			}
-		}*/
 
 }
