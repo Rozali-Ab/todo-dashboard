@@ -1,11 +1,12 @@
 export type ColumnType = {
-	id: number;
+	id: string;
 	title: string;
 	order: number;
 }
 
 export type TaskType = {
-	id: number;
+	id: string;
 	title: string;
-	parentColumnId: number;
+	parentColumnId: string;
+	order: number;
 }

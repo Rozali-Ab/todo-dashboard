@@ -31,13 +31,22 @@ const formTemplate = ({title}: TaskType) => {
     </div>
 	`;
 
+	setTimeout(() => {
+		const input = form.querySelector('#new-task-title') as HTMLInputElement;
+		if (input) {
+			input.focus();
+			input.setSelectionRange(input.value.length, input.value.length);
+		}
+	}, 0);
+
 	return form;
 };
 
 const emptyTask: TaskType = {
-	id: 0,
+	id: '0',
 	title: '',
-	parentColumnId: 0,
+	parentColumnId: '0',
+	order: 1
 };
 
 export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
@@ -54,35 +63,51 @@ export const useTaskForm = (taskPayload?: Partial<TaskType>) => {
 		modal.open();
 
 		return new Promise((resolve, reject) => {
-			form.addEventListener('submit', (evt) => {
-				modal.close();
-				return resolve(onSubmitForm(evt));
+			form.addEventListener('submit', async (evt) => {
+				await handleSubmit(evt, modal, resolve, reject);
 			});
 
 			const cancelButton = document.getElementById('cancel-task');
 			cancelButton?.addEventListener('click', () => {
 				modal.close();
-				return reject();
+				reject();
 			});
 		});
 
 	};
 
-	const onSubmitForm = (evt: SubmitEvent): TaskType => {
-		evt.preventDefault();
-
+	const onSubmitForm = async (evt: SubmitEvent): Promise<TaskType | null> => {
 		const formNode = evt.target as HTMLFormElement;
 		const titleInput = getFormData(formNode).title;
 
 		if (!taskToUse.title) {
 
-			return createTask(titleInput, taskToUse.parentColumnId);
+			return await createTask(titleInput, taskToUse.parentColumnId);
 		}
 
 		taskToUse.title = titleInput;
-		updateTaskTitle(taskToUse);
+		await updateTaskTitle(taskToUse);
 
 		return taskToUse;
+	};
+
+	const handleSubmit = async (
+		evt: SubmitEvent,
+		modal: AppModal,
+		resolve: (value: TaskType | PromiseLike<TaskType>) => void,
+		reject: (reason?: Error | null) => void
+	) => {
+		evt.preventDefault();
+
+		try {
+			const task = await onSubmitForm(evt);
+			modal.close();
+
+			if (task) resolve(task);
+		} catch (e) {
+			console.log('Error submitting task form', e);
+			reject(e instanceof Error ? e : null);
+		}
 	};
 
 	return {

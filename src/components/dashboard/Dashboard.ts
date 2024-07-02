@@ -6,26 +6,36 @@ import {useColumnForm} from '../NavBar/useColumnForm.ts';
 import Task from './Task/Task.ts';
 import {useTaskForm} from '../NavBar/useTaskForm.ts';
 
-const {tasks, columns, removeColumnById, removeTaskById, removeAllTasksByParentId} = useTasksStore();
+const {
+	tasks,
+	columns,
+	removeColumnById,
+	removeTaskById,
+	removeAllTasksByParentId
+} = useTasksStore();
 
 export default class Dashboard extends HTMLElement {
 	columns: ColumnType[];
 	tasks: TaskType[];
-	isLoading: boolean;
-	loadingContainer = document.createElement('div');
 
 	constructor() {
 		super();
 
 		this.columns = [];
 		this.tasks = [];
-		this.isLoading = false;
 	}
 
 	connectedCallback() {
 		this.buildTemplate();
-		this.getData();
+		this.getData()
+		.catch((e) => {
+			console.log('Error in connectedCallback', e);
+		})
+		.then(() => this.renderColumnsAndTasks())
+		.then(() => this.addEventListeners());
+	}
 
+	addEventListeners() {
 		this.addEventListener(COLUMN_TOOLS_EVENTS.REMOVE_COLUMN, this.removeColumn);
 		this.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, this.editColumn);
 		this.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, this.addNewTask);
@@ -40,43 +50,28 @@ export default class Dashboard extends HTMLElement {
 	}
 
 	async getData() {
-		this.showLoading();
-
 		try {
-			this.tasks = await tasks;
-			this.columns = await columns;
-			this.renderColumnsAndTasks();
+			this.tasks = tasks;
+			this.columns = columns;
 		} catch (e) {
 			console.log('getData error at Dashboard', e);
-		} finally {
-			this.hideLoading();
+			this.tasks = [];
+			this.columns = [];
 		}
-	}
-
-	showLoading() {
-		this.isLoading = true;
-
-		this.loadingContainer.classList.add('loading');
-		this.loadingContainer.textContent = 'Loading...';
-		this.appendChild(this.loadingContainer);
-	}
-
-	hideLoading() {
-		this.isLoading = false;
-		this.loadingContainer.classList.remove('loading');
-		this.loadingContainer.innerHTML = '';
-		this.removeChild(this.loadingContainer);
 	}
 
 	renderColumnsAndTasks() {
 		this.columns.forEach((column) => {
 
-			const tasksInColumn = this.tasks.filter((task) => task.parentColumnId === column.id);
+			const tasksInColumn = this.tasks
+			.filter((task) => task.parentColumnId === column.id);
 
 			const columnComponent = new Column(column);
 
 			if (tasksInColumn) {
-				tasksInColumn.forEach((task) => {
+				const sortedByOrder = tasksInColumn.sort((task1, task2) => task1.order > task2.order ? 1 : -1);
+
+				sortedByOrder.forEach((task) => {
 					columnComponent.appendTask(task);
 				});
 			}
@@ -94,7 +89,7 @@ export default class Dashboard extends HTMLElement {
 	async removeColumn(evt: Event) {
 		const {detail} = evt as CustomEvent;
 
-		const columnId = Number(detail.id || (evt.target as Column).id);
+		const columnId = detail.id || (evt.target as Column).id;
 
 		try {
 			await removeColumnById(columnId);
@@ -110,7 +105,7 @@ export default class Dashboard extends HTMLElement {
 
 	async editColumn(evt: Event) {
 		const {detail} = evt as CustomEvent;
-		const columnId = Number(detail.id || (evt.target as Column).id);
+		const columnId = detail.id || (evt.target as Column).id;
 		const currentColumnInStore = columns.find(column => column.id === columnId);
 
 		const {showColumnForm} = useColumnForm(currentColumnInStore);
@@ -126,7 +121,7 @@ export default class Dashboard extends HTMLElement {
 
 	async addNewTask(evt: Event) {
 		const {detail} = evt as CustomEvent;
-		const columnId = Number(detail.id || (evt.target as Column).id);
+		const columnId = detail.id || (evt.target as Column).id;
 
 		try {
 
@@ -145,7 +140,7 @@ export default class Dashboard extends HTMLElement {
 
 		const {detail} = evt as CustomEvent;
 
-		const taskId = Number(detail.id || (evt.target as Task).id);
+		const taskId = detail.id || (evt.target as Task).id;
 
 		await removeTaskById(taskId);
 	}
@@ -154,9 +149,9 @@ export default class Dashboard extends HTMLElement {
 
 		const {detail} = evt as CustomEvent;
 
-		const taskId = Number(detail.id || (evt.target as Task).id);
+		const taskId = detail.id || (evt.target as Task).id;
 
-		const currentTaskInStore = tasks.find(task => task.id === Number(taskId));
+		const currentTaskInStore = tasks.find(task => task.id === taskId);
 
 		try {
 			const {showTaskForm} = useTaskForm(currentTaskInStore);

@@ -11,6 +11,7 @@ const formTemplate = ({title}: ColumnType) => {
 	const form = document.createElement('form');
 	form.classList.add('form-new-column');
 	form.setAttribute('id', 'form-new-column');
+
 	form.innerHTML = `
 		<label class="form-new-column__label" for="title">${isNew} column title
       <input
@@ -29,11 +30,20 @@ const formTemplate = ({title}: ColumnType) => {
         <button class="submit" type="submit" id="submit-column">Save</button>
     </div>
 	`;
+
+	setTimeout(() => {
+		const input = form.querySelector('#new-column-title') as HTMLInputElement;
+		if (input) {
+			input.focus();
+			input.setSelectionRange(input.value.length, input.value.length);
+		}
+	}, 0);
+
 	return form;
 };
 
 const emptyColumn: ColumnType = {
-	id: 0,
+	id: '0',
 	title: '',
 	order: 0,
 };
@@ -52,37 +62,50 @@ export const useColumnForm = (columnPayload?: ColumnType) => {
 
 		return new Promise((resolve, reject) => {
 
-			form.addEventListener('submit', (evt) => {
-
-				modal.close();
-
-				return resolve(onSubmitForm(evt));
+			form.addEventListener('submit', async (evt) => {
+				await handleSubmit(evt, modal, resolve, reject);
 			});
 
 			const cancelButton = document.getElementById('cancel-column');
 			cancelButton?.addEventListener('click', () => {
 				modal.close();
-
-				return reject();
+				reject();
 			});
 		});
 	};
 
-	const onSubmitForm = (evt: SubmitEvent) => {
-		evt.preventDefault();
-
+	const onSubmitForm = async (evt: SubmitEvent) => {
 		const formNode = evt.target as HTMLFormElement;
 		const titleInput = getFormData(formNode).title;
 
 		if (!columnToUse.title) {
 
-			return createColumn(titleInput);
+			return await createColumn(titleInput);
 		}
 
 		columnToUse.title = titleInput;
-		updateColumnById(columnToUse);
+		await updateColumnById(columnToUse);
 
 		return columnToUse;
+	};
+
+	const handleSubmit = async (
+		evt: SubmitEvent,
+		modal: AppModal,
+		resolve: (value: ColumnType | PromiseLike<ColumnType>) => void,
+		reject: (reason?: Error | null) => void
+	) => {
+		evt.preventDefault();
+
+		try {
+			const column = await onSubmitForm(evt);
+			modal.close();
+
+			if (column) resolve(column);
+		} catch (e) {
+			console.log('Error submitting column form', e);
+			reject(e instanceof Error ? e : null);
+		}
 	};
 
 	return {

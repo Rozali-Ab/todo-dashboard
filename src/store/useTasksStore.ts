@@ -1,101 +1,139 @@
-import {LOCAL_STORAGE_KEYS} from '../constants/localStorageKeys.ts';
 import type {ColumnType, TaskType} from './types/types';
+import {
+	deleteColumnById,
+	deleteTaskById,
+	fetchColumns,
+	fetchTasks,
+	postColumn,
+	postTask,
+	updateColumn,
+	updateTask
+} from '../api';
 
-const getFromLocalStorage = (key: string) => {
-	const data = localStorage.getItem(key);
+let tasks: TaskType[] = await fetchTasks();
+let columns: ColumnType[] = await fetchColumns();
 
-	return data ? JSON.parse(data) : null;
+const getTaskOrder = (columnId: string) => {
+
+	return tasks.filter(task => task.parentColumnId === columnId).length + 1;
 };
-
-const setToLocalStorage = (key: string, value: TaskType[] | ColumnType[]) => {
-	localStorage.setItem(key, JSON.stringify(value));
-};
-
-let tasks: TaskType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.TASKS) || [];
-let columns: ColumnType[] = getFromLocalStorage(LOCAL_STORAGE_KEYS.COLUMNS) || [];
 
 export const useTasksStore = () => {
 
-	const saveTasks = () => {
-		setToLocalStorage(LOCAL_STORAGE_KEYS.TASKS, tasks);
-	};
+	const createTask = async (title: string, parentColumnId: string) => {
 
-	const saveColumns = () => {
-		setToLocalStorage(LOCAL_STORAGE_KEYS.COLUMNS, columns);
-	};
-
-	const createTask = (title: string, parentColumnId: number) => {
 		const task: TaskType = {
-			id: Date.now(),
+			id: Date.now().toString(),
 			title: title,
 			parentColumnId: parentColumnId,
+			order: getTaskOrder(parentColumnId),
 		};
-		tasks.push(task);
-		saveTasks();
 
-		return task;
+		try {
+			tasks.push(task);
+			await postTask(task);
+
+			return task;
+		} catch (e) {
+			console.log('Error saving task at createTask', e);
+			return null;
+		}
+
 	};
 
-	const createColumn = (title: string) => {
+	const createColumn = async (title: string) => {
 
 		const column: ColumnType = {
-			id: Date.now(),
+			id: Date.now().toString(),
 			title: title,
 			order: columns.length
 		};
 
-		columns.push(column);
-		saveColumns();
-		return column;
-	};
-
-	const removeTaskById = (taskId: number) => {
-		const index = tasks.findIndex(task => task.id === taskId);
-		if (index !== -1) {
-			tasks.splice(index, 1);
-			saveTasks();
+		try {
+			columns.push(column);
+			await postColumn(column);
+			return column;
+		} catch (e) {
+			console.log('Error saving column', e);
+			return null;
 		}
 	};
 
-	const removeAllTasksByParentId = (parentId: number) => {
+	const removeTaskById = async (taskId: string) => {
+		const index = tasks.findIndex(task => task.id === taskId);
+		if (index !== -1) {
+			tasks.splice(index, 1);
+			await deleteTaskById(taskId);
+		}
+	};
+
+	const removeAllTasksByParentId = async (parentId: string) => {
+
+		const taskToRemove = tasks.filter(task => task.parentColumnId === parentId);
+
+		for (const task of taskToRemove) {
+			try {
+				await deleteTaskById(task.id);
+			} catch (e) {
+				console.log('Error removing task id ', task.id);
+			}
+		}
+
 		tasks = tasks.filter(task => task.parentColumnId !== parentId);
-		saveTasks();
 	};
 
-	const removeColumnById = (columnId: number) => {
+	const removeColumnById = async (columnId: string) => {
 		columns = columns.filter(column => column.id !== columnId);
-		saveColumns();
+		await deleteColumnById(columnId);
 	};
 
-	const updateTaskParentIdById = (taskId: number, parentId: number) => {
+	const updateTaskParentIdById = async (taskId: string, parentId: string) => {
 		const updatedTask = tasks.find(task => task.id === taskId);
 
 		if (updatedTask) {
 			updatedTask.parentColumnId = parentId;
-			saveTasks();
+			await updateTask(updatedTask);
 		}
 	};
 
-	const updateTaskTitle = (payload: TaskType) => {
+	const updateTaskTitle = async (payload: TaskType) => {
 		const {id} = payload;
 		const index = tasks.findIndex(task => task.id === id);
 		tasks[index] = payload;
-		saveTasks();
+		await updateTask(payload);
 	};
 
-	const updateColumnById = (payload: ColumnType) => {
+	const updateTaskOrder = async (id: string, order: number) => {
+		const updatedTask = tasks.find(task => task.id === id);
+
+		if (updatedTask) {
+
+			updatedTask.order = order;
+
+			await updateTask(updatedTask);
+		}
+
+	};
+
+	const updateColumnById = async (payload: ColumnType) => {
 		const {id} = payload;
 		const index = columns.findIndex(column => column.id === id);
 
 		if (index >= 0) {
 			columns[index] = payload;
 		}
-		saveColumns();
+		await updateColumn(payload);
 	};
 
-	const findColumnById = (columnId: number) => {
+	const findColumnById = (columnId: string) => {
 		if (columnId) {
 			return columns.find(column => column.id === columnId);
+		}
+	};
+
+	const findTaskById = (taskId: string) => {
+		if (taskId) {
+			return tasks.find(task => task.id === taskId);
 		}
 	};
 
@@ -109,7 +147,9 @@ export const useTasksStore = () => {
 		removeColumnById,
 		updateTaskParentIdById,
 		updateTaskTitle,
+		updateTaskOrder,
 		updateColumnById,
-		findColumnById
+		findColumnById,
+		findTaskById
 	};
 };
