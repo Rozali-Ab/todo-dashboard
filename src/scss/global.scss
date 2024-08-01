@@ -25,10 +25,6 @@ body {
   color: $app-text-color;
 }
 
-nav {
-  @include fd-row;
-}
-
 button {
   @include app-button;
 }
@@ -46,6 +42,7 @@ input, textarea, button {
   @media (max-width: 630px) {
     display: flex;
     justify-content: center;
+    flex-direction: column;
   }
 }
 

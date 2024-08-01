@@ -1,18 +1,18 @@
-import {useTasksStore} from '../../store/useTasksStore.ts';
-import {ColumnType, TaskType} from '../../store/types/types.ts';
 import Column from './Column/Column.ts';
-import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/dasboardEvents.ts';
-import {useColumnForm} from '../NavBar/useColumnForm.ts';
 import Task from './Task/Task.ts';
-import {useTaskForm} from '../NavBar/useTaskForm.ts';
+import Store from '../../store/Store.ts';
+import {useStore} from '../../store/useStore.ts';
+import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/events.ts';
+import type {ColumnType, TaskType} from '../../types/types.ts';
 
 const {
-	tasks,
-	columns,
+	createTask,
 	removeColumnById,
 	removeTaskById,
-	removeAllTasksByParentId
-} = useTasksStore();
+	removeAllTasksByParentId,
+	updateColumnTitle,
+	updateTaskTitle
+} = useStore();
 
 export default class Dashboard extends HTMLElement {
 	columns: ColumnType[];
@@ -23,25 +23,22 @@ export default class Dashboard extends HTMLElement {
 
 		this.columns = [];
 		this.tasks = [];
+
+		this.buildTemplate();
 	}
 
 	connectedCallback() {
-		this.buildTemplate();
-		this.getData()
-		.catch((e) => {
-			console.log('Error in connectedCallback', e);
-		})
-		.then(() => this.renderColumnsAndTasks())
-		.then(() => this.addEventListeners());
+		this.addEventListeners();
 	}
 
 	addEventListeners() {
-		this.addEventListener(COLUMN_TOOLS_EVENTS.REMOVE_COLUMN, this.removeColumn);
-		this.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, this.editColumn);
-		this.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, this.addNewTask);
+		this.addEventListener(COLUMN_TOOLS_EVENTS.REMOVE_COLUMN, this.removeColumn.bind(this));
+		this.addEventListener(COLUMN_TOOLS_EVENTS.EDIT_COLUMN, this.editColumn.bind(this));
 
-		this.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, this.removeTask);
-		this.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, this.editTask);
+		this.addEventListener(COLUMN_TOOLS_EVENTS.ADD_TASK, this.addNewTask.bind(this));
+
+		this.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, this.removeTask.bind(this));
+		this.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, this.editTask.bind(this));
 	}
 
 	buildTemplate() {
@@ -49,41 +46,29 @@ export default class Dashboard extends HTMLElement {
 		this.classList.add('dashboard');
 	}
 
-	async getData() {
-		try {
-			this.tasks = tasks;
-			this.columns = columns;
-		} catch (e) {
-			console.log('getData error at Dashboard', e);
-			this.tasks = [];
-			this.columns = [];
-		}
-	}
-
 	renderColumnsAndTasks() {
-		this.columns.forEach((column) => {
 
-			const tasksInColumn = this.tasks
-			.filter((task) => task.parentColumnId === column.id);
+		this.innerHTML = '';
 
-			const columnComponent = new Column(column);
+		if (this.columns && this.tasks) {
+			this.columns.forEach((column) => {
 
-			if (tasksInColumn) {
-				const sortedByOrder = tasksInColumn.sort((task1, task2) => task1.order > task2.order ? 1 : -1);
+				const tasksInColumn = this.tasks
+				.filter((task) => task.parentColumnId === column.id);
 
-				sortedByOrder.forEach((task) => {
-					columnComponent.appendTask(task);
-				});
-			}
+				const columnComponent = new Column(column);
 
-			this.appendChild(columnComponent);
-		});
-	}
+				if (tasksInColumn) {
+					const sortedByOrder = tasksInColumn.sort((task1, task2) => task1.order > task2.order ? 1 : -1);
 
-	appendNewColumn(column: ColumnType) {
-		const columnElement = new Column(column);
+					sortedByOrder.forEach((task) => {
+						columnComponent.appendTask(task);
+					});
+				}
 
-		this.appendChild(columnElement);
+				this.appendChild(columnComponent);
+			});
+		}
 	}
 
 	async removeColumn(evt: Event) {
@@ -92,11 +77,10 @@ export default class Dashboard extends HTMLElement {
 		const columnId = detail.id || (evt.target as Column).id;
 
 		try {
-			await removeColumnById(columnId);
-
 			if (!detail.isEmpty) {
 				await removeAllTasksByParentId(columnId);
 			}
+			await removeColumnById(columnId);
 
 		} catch (e) {
 			console.log('Column not removed', e);
@@ -106,40 +90,20 @@ export default class Dashboard extends HTMLElement {
 	async editColumn(evt: Event) {
 		const {detail} = evt as CustomEvent;
 		const columnId = detail.id || (evt.target as Column).id;
-		const currentColumnInStore = columns.find(column => column.id === columnId);
 
-		const {showColumnForm} = useColumnForm(currentColumnInStore);
-
-		try {
-			const updatedColumn = await showColumnForm();
-			(evt.target as Column).updateColumnTitle(updatedColumn);
-		} catch (e) {
-			console.log('edit column rejected ', e);
-		}
-
+		await updateColumnTitle(columnId);
 	}
 
 	async addNewTask(evt: Event) {
 		const {detail} = evt as CustomEvent;
 		const columnId = detail.id || (evt.target as Column).id;
 
-		try {
-
-			const {showTaskForm} = useTaskForm({parentColumnId: columnId});
-
-			const newTask = await showTaskForm();
-
-			(evt.target as Column).appendTask(newTask);
-
-		} catch (e) {
-			console.log('add task reject ', e);
-		}
+		await createTask(columnId);
 	}
 
 	async removeTask(evt: Event) {
 
 		const {detail} = evt as CustomEvent;
-
 		const taskId = detail.id || (evt.target as Task).id;
 
 		await removeTaskById(taskId);
@@ -148,20 +112,24 @@ export default class Dashboard extends HTMLElement {
 	async editTask(evt: Event) {
 
 		const {detail} = evt as CustomEvent;
-
 		const taskId = detail.id || (evt.target as Task).id;
 
-		const currentTaskInStore = tasks.find(task => task.id === taskId);
+		await updateTaskTitle(taskId);
+	}
 
-		try {
-			const {showTaskForm} = useTaskForm(currentTaskInStore);
-			const updatedTask: TaskType = await showTaskForm();
+	updateDashboard(state: Store) {
 
-			(evt.target as Task).updateTaskTitle(updatedTask);
-		} catch (e) {
-			console.log('edit task reject ', e);
+		const {tasks, columns} = state.user;
+		this.tasks = tasks || [];
+		this.columns = columns || [];
+
+		this.renderColumnsAndTasks();
+
+		if (!state.isAuth) {
+			this.innerHTML = '';
 		}
 	}
+
 }
 
 customElements.define('dashboard-component', Dashboard);

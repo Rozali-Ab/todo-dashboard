@@ -3,20 +3,28 @@ import Dashboard from '../components/dashboard/Dashboard.ts';
 import NavBar from '../components/NavBar/NavBar.ts';
 import Loader from '../components/Loader/Loader.ts';
 
-const loader = new Loader();
-
 export const store = new Store();
-store.subscribe(state => state.isLoading ? loader.show() : loader.hide());
 
+const loader = new Loader();
 const navBar = new NavBar();
+const dashboard = new Dashboard();
 
-export const dashboard = new Dashboard();
-await store.init();
+store.subscribe(state => state.isLoading ? loader.show() : loader.hide());
+store.subscribe(state => dashboard.updateDashboard(state));
+store.subscribe(state => navBar.updateUI(state));
 
-const main = document.createElement('main');
-main.classList.add('container');
-document.body.prepend(main);
+const initApp = async () => {
+	await store.init();
 
-main.prepend(navBar);
-main.append(dashboard);
-main.append(loader);
+	const main = document.createElement('main');
+	main.classList.add('container');
+	document.body.prepend(main);
+
+	main.prepend(navBar);
+	main.append(dashboard);
+	main.append(loader);
+};
+
+initApp().catch(error => {
+	console.error('Failed to initialize the application', error);
+});

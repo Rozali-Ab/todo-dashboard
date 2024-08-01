@@ -1,7 +1,10 @@
+import {useDnD} from '../useDnD.ts';
 import Task from '../Task/Task.ts';
-import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../../constants/dasboardEvents.ts';
-import type {ColumnType, TaskType} from '../../../store/types/types.ts';
 import {confirmDeleteColumn} from './utils/confirmDeleteColumn.ts';
+import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../../constants/events.ts';
+import type {ColumnType, TaskType} from '../../../types/types.ts';
+
+const {onDragEnter} = useDnD();
 
 export default class Column extends HTMLElement {
 	id = '';
@@ -38,7 +41,7 @@ export default class Column extends HTMLElement {
 		this.buildTemplate();
 		this.columnTools.addEventListener('click', this.onColumnToolsClick.bind(this));
 		this.columnBody.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => this.removeTask(evt as CustomEvent));
-
+		this.addEventListener('dragenter', onDragEnter);
 	}
 
 	appendTask(task: TaskType) {
@@ -53,8 +56,12 @@ export default class Column extends HTMLElement {
 
 	removeTask(evt: CustomEvent) {
 
-		const taskId = Number(evt.detail.id);
+		const taskId = evt.detail.id;
 
+		this.removeTaskById(taskId);
+	}
+
+	removeTaskById(taskId: string) {
 		const index = this.taskArray.findIndex((task) => task.id === taskId);
 		this.taskArray.splice(index, 1);
 	}
@@ -122,9 +129,6 @@ export default class Column extends HTMLElement {
 		}, 300);
 	}
 
-	updateColumnTitle(payload: ColumnType) {
-		this.title = payload.title;
-		this.columnTitle.textContent = this.title;
-	}
-
 }
+
+customElements.define('column-component', Column);

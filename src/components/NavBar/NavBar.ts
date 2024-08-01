@@ -21,8 +21,6 @@ export default class NavBar extends HTMLElement {
 		super();
 
 		this.buildTemplate();
-		store.subscribe(this.updateUI.bind(this));
-		this.updateUI(store.state);
 	}
 
 	connectedCallback() {
