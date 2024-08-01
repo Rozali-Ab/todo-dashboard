@@ -2,7 +2,6 @@ export default class Loader extends HTMLElement {
 
 	constructor() {
 		super();
-		document.body.appendChild(this);
 	}
 
 	connectedCallback() {
