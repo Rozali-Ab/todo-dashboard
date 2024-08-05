@@ -15,6 +15,7 @@ const {
 	removeColumnById,
 	removeTaskById,
 	removeAllTasksByParentId,
+	updateTaskStatus,
 	updateColumnTitle,
 	updateTaskTitle
 } = useStore();
@@ -44,6 +45,7 @@ export default class Dashboard extends HTMLElement {
 
 		this.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, this.removeTask.bind(this));
 		this.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, this.editTask.bind(this));
+		this.addEventListener(TASK_TOOLS_EVENTS.IS_DONE_TASK, this.handleTaskCheckbox.bind(this));
 
 		this.addEventListener('dragstart', onDragStart);
 		this.addEventListener('dragenter', onDragEnter);
@@ -128,6 +130,16 @@ export default class Dashboard extends HTMLElement {
 		const taskId = detail.id || (evt.target as Task).id;
 
 		await updateTaskTitle(taskId);
+	}
+
+	async handleTaskCheckbox(evt: Event) {
+		const {detail} = evt as CustomEvent;
+
+		const taskId = detail.id || (evt.target as Task).id;
+		const isDone = detail.isDone;
+
+		await updateTaskStatus(taskId, isDone);
+
 	}
 
 	updateDashboard(state: Store) {

@@ -7,9 +7,26 @@
   min-height: 50px;
   background-color: $task-background-color;
   margin-top: .5rem;
-  padding: .5rem 1rem;
+
   opacity: 1;
   transition: all .3s ease-in-out;
+
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    border: 1px #636363 solid;
+    border-radius: 10px;
+
+    &:checked {
+      background-color: rgba(65, 126, 167, 0.5882352941);
+    }
+  }
+
+  &--done {
+    text-decoration: line-through;
+    color: #636363;
+  }
 
   &:hover {
     cursor: grab;
@@ -25,7 +42,7 @@
   &-tools {
     @include fd-row;
     position: absolute;
-    padding-right: .1rem;
+    top: 0;
     justify-content: end;
     align-items: center;
     right: 0;

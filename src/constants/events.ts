@@ -6,5 +6,6 @@ export const COLUMN_TOOLS_EVENTS = {
 
 export const TASK_TOOLS_EVENTS = {
 	EDIT_TASK: 'edit-task',
-	REMOVE_TASK: 'remove-task'
+	REMOVE_TASK: 'remove-task',
+	IS_DONE_TASK: 'is-done-task',
 };
