@@ -35,7 +35,7 @@ export async function setColumn(userId: string, columnId: string, columnData: Co
 
 	try {
 		await set(columnRef, columnData);
-		console.log('Column added/updated successfully.');
+		showMessage('Column added/updated successfully.');
 	} catch (error) {
 		showMessage('Oops! Not saved');
 		throw error;
@@ -48,7 +48,7 @@ export async function setTask(userId: string, taskId: string, taskData: TaskType
 
 	try {
 		await set(taskRef, taskData);
-		console.log('Task added/updated successfully.');
+		showMessage('Task added/updated successfully.');
 	} catch (error) {
 		showMessage('Oops! Not saved');
 		throw error;
@@ -60,7 +60,7 @@ export async function removeColumn(userId: string, columnId: string) {
 
 	try {
 		await remove(columnRef);
-		console.log('Column removed successfully.');
+		showMessage('Column removed successfully.');
 	} catch (error) {
 		showMessage('Error removing column');
 		throw error;
@@ -72,7 +72,7 @@ export async function removeTask(userId: string, taskId: string) {
 
 	try {
 		await remove(taskRef);
-		console.log('Task removed successfully.');
+		showMessage('Task removed successfully.');
 	} catch (error) {
 		showMessage('Error removing task');
 		throw error;

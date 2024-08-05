@@ -14,28 +14,20 @@ export async function registerUser(user: UserType) {
 
 	const {email, password, username} = user;
 
-	try {
-		const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
-		const userId = userCredentials.user.uid;
+	const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+	const userId = userCredentials.user.uid;
 
-		await writeUserToDatabase(userId, email, username);
+	await writeUserToDatabase(userId, email, username);
 
-		return userId;
-	} catch (error) {
-		throw error;
-	}
+	return userId;
 }
 
 export async function signInUser(user: UserType) {
 	const {email, password} = user;
 
-	try {
-		const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+	const userCredentials = await signInWithEmailAndPassword(auth, email, password);
 
-		return userCredentials.user.uid;
-	} catch (error) {
-		throw error;
-	}
+	return userCredentials.user.uid;
 }
 
 export async function logoutUser() {
