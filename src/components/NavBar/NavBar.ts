@@ -5,6 +5,7 @@ import Store from '../../store/Store.ts';
 import AppModal from '../AppModal/AppModal.ts';
 import {registerUser, signInUser} from '../../firebase/auth.ts';
 import type {UserType} from '../../types/types.ts';
+import {showMessage} from '../../utils/showMessage.ts';
 
 const {createColumn} = useStore();
 
@@ -94,7 +95,7 @@ export default class NavBar extends HTMLElement {
 					store.login(userData);
 				}
 			} catch (err) {
-				console.log('Wrong email or password');
+				showMessage('Wrong email or password');
 			}
 		}
 	}
@@ -119,7 +120,7 @@ export default class NavBar extends HTMLElement {
 
 				store.login(newUser);
 			} catch (err) {
-				console.log('Some problems with registration ');
+				showMessage('Use another email');
 			}
 		}
 

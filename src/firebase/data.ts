@@ -3,6 +3,7 @@ import {get, ref, remove, set} from '@firebase/database';
 import {database, getUserRef} from './auth.ts';
 import {COLUMNS_PATH, TASKS_PATH, USERS_PATH} from '../constants/databasePaths.ts';
 import type {ColumnType, TaskType, UserType} from '../types/types.ts';
+import {showMessage} from '../utils/showMessage.ts';
 
 export async function getUserData(userId: string) {
 	const userRef = getUserRef(userId);
@@ -23,7 +24,7 @@ export async function getUserData(userId: string) {
 
 		return userData;
 	} else {
-		console.log('No data available');
+		showMessage('No data available');
 		return null;
 	}
 }
@@ -36,7 +37,8 @@ export async function setColumn(userId: string, columnId: string, columnData: Co
 		await set(columnRef, columnData);
 		console.log('Column added/updated successfully.');
 	} catch (error) {
-		console.log('Error adding/updating column:', error);
+		showMessage('Oops! Not saved');
+		throw error;
 	}
 }
 
@@ -48,7 +50,8 @@ export async function setTask(userId: string, taskId: string, taskData: TaskType
 		await set(taskRef, taskData);
 		console.log('Task added/updated successfully.');
 	} catch (error) {
-		console.log('Error adding/updating task:', error);
+		showMessage('Oops! Not saved');
+		throw error;
 	}
 }
 
@@ -59,7 +62,8 @@ export async function removeColumn(userId: string, columnId: string) {
 		await remove(columnRef);
 		console.log('Column removed successfully.');
 	} catch (error) {
-		console.log('Error removing column:', error);
+		showMessage('Error removing column');
+		throw error;
 	}
 }
 
@@ -70,7 +74,8 @@ export async function removeTask(userId: string, taskId: string) {
 		await remove(taskRef);
 		console.log('Task removed successfully.');
 	} catch (error) {
-		console.log('Error removing task:', error);
+		showMessage('Error removing task');
+		throw error;
 	}
 }
 

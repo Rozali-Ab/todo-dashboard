@@ -22,24 +22,6 @@ export async function registerUser(user: UserType) {
 
 		return userId;
 	} catch (error) {
-		//
-		// const errorCode = error.code;
-		//
-		// switch (errorCode) {
-		// 	case 'auth/email-already-in-use':
-		// 		console.log('Email is already in use.');
-		// 		break;
-		// 	case 'auth/invalid-email':
-		// 		console.log('Invalid email');
-		// 		break;
-		// 	case 'auth/weak-password':
-		// 		console.log('Weak password');
-		// 		break;
-		// 	default:
-		// 		console.log('Error registering user:', error.message);
-		// 		break;
-		//
-		// }
 		throw error;
 	}
 }
@@ -52,16 +34,6 @@ export async function signInUser(user: UserType) {
 
 		return userCredentials.user.uid;
 	} catch (error) {
-		//
-		// if (error.code === 'auth/user-not-found') {
-		// 	console.log('User not found');
-		// }
-		//
-		// if (error.code === 'auth/wrong-password') {
-		// 	console.log('Wrong password');
-		// }
-
-		console.log('Error signing in user');
 		throw error;
 	}
 }
@@ -81,7 +53,7 @@ async function writeUserToDatabase(userId: string, email: string, username: stri
 		console.log('User record created in database.');
 	})
 	.catch((error) => {
-		console.log('Error creating user record:', error.message);
+		throw error;
 	});
 }
 
