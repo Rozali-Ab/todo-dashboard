@@ -2,6 +2,7 @@ import Store from '../store/Store.ts';
 import Dashboard from '../components/dashboard/Dashboard.ts';
 import NavBar from '../components/NavBar/NavBar.ts';
 import Loader from '../components/Loader/Loader.ts';
+import {showMessage} from '../utils/showMessage.ts';
 
 export const store = new Store();
 
@@ -25,6 +26,7 @@ const initApp = async () => {
 	main.append(loader);
 };
 
-initApp().catch(error => {
-	console.error('Failed to initialize the application', error);
+initApp().catch(() => {
+	showMessage('Failed to initialize the application');
+	return;
 });

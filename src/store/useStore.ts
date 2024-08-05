@@ -17,7 +17,6 @@ export const fetchUserData = async (userId: string) => {
 
 		return currentUser;
 	} catch (error) {
-		console.log(error);
 		return null;
 	} finally {
 		store.setLoading(false);
@@ -92,7 +91,7 @@ export const useStore = () => {
 				store.update();
 			}
 		} catch (error) {
-			console.log(error);
+			return null;
 		} finally {
 			store.setLoading(false);
 		}
@@ -124,7 +123,7 @@ export const useStore = () => {
 			});
 
 		} catch (error) {
-			console.log(error);
+			return null;
 		} finally {
 			store.setLoading(false);
 		}
@@ -169,7 +168,7 @@ export const useStore = () => {
 
 				store.update();
 			} catch (error) {
-				console.log(error);
+				return null;
 			} finally {
 				store.setLoading(false);
 			}
@@ -193,7 +192,7 @@ export const useStore = () => {
 
 				store.update();
 			} catch (error) {
-				console.log(error);
+				return null;
 			} finally {
 				store.setLoading(false);
 			}
@@ -234,7 +233,7 @@ export const useStore = () => {
 		try {
 			await setTask(userId, taskId, task);
 		} catch (error) {
-			console.log(error);
+			return null;
 		} finally {
 			store.setLoading(false);
 		}
@@ -250,7 +249,7 @@ export const useStore = () => {
 		try {
 			await setColumn(userId, columnId, column);
 		} catch (error) {
-			console.log(error);
+			return null;
 		} finally {
 			store.setLoading(false);
 		}

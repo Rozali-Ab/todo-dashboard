@@ -2,7 +2,7 @@ nav-bar {
   display: flex;
   @include fd-row;
   width: 100%;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-bottom: 2rem;
 }
 

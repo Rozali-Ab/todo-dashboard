@@ -1,10 +1,7 @@
-import {useDnD} from '../useDnD.ts';
 import Task from '../Task/Task.ts';
 import {confirmDeleteColumn} from './utils/confirmDeleteColumn.ts';
 import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../../constants/events.ts';
 import type {ColumnType, TaskType} from '../../../types/types.ts';
-
-const {onDragEnter} = useDnD();
 
 export default class Column extends HTMLElement {
 	id = '';
@@ -41,7 +38,6 @@ export default class Column extends HTMLElement {
 		this.buildTemplate();
 		this.columnTools.addEventListener('click', this.onColumnToolsClick.bind(this));
 		this.columnBody.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => this.removeTask(evt as CustomEvent));
-		this.addEventListener('dragenter', onDragEnter);
 	}
 
 	appendTask(task: TaskType) {
