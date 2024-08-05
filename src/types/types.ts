@@ -9,6 +9,7 @@ export type TaskType = {
 	title: string;
 	parentColumnId: string;
 	order: string;
+	isDone: boolean;
 }
 
 export type UserType = {

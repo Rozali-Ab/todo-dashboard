@@ -45,6 +45,7 @@ export const useStore = () => {
 			title: formData.title,
 			parentColumnId: parentColumnId,
 			order: getTaskOrder(tasks, parentColumnId).toString(),
+			isDone: false,
 		};
 
 		await updateTaskOnServer(newTask)
@@ -175,6 +176,27 @@ export const useStore = () => {
 		}
 	};
 
+	const updateTaskStatus = async (id: string, isDone: boolean) => {
+		if (!currentUser) return;
+
+		const task = currentUser.tasks.find(task => task.id === id);
+		if (task) {
+
+			try {
+				task.isDone = isDone;
+				store.setLoading(true);
+
+				await setTask(currentUser.id, task.id, task);
+
+				store.update();
+			} catch (error) {
+				return null;
+			} finally {
+				store.setLoading(false);
+			}
+		}
+	};
+
 	const updateColumnTitle = async (id: string) => {
 
 		if (!currentUser) return;
@@ -264,6 +286,7 @@ export const useStore = () => {
 		updateTaskParentId,
 		updateTaskTitle,
 		updateTaskOrder,
+		updateTaskStatus,
 		updateColumnTitle,
 		findColumnById,
 		findTaskById
