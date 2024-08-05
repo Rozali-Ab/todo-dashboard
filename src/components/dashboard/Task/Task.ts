@@ -1,10 +1,5 @@
 import {TASK_TOOLS_EVENTS} from '../../../constants/events.ts';
-// import {useDnD} from '../useDnD.ts';
-// import {useTouchDnD} from '../useTouchDnD.ts';
 import type {TaskType} from '../../../types/types.ts';
-//
-// const {onDragStart, onDragEnd} = useDnD();
-// const {onTouchStart, onTouchMove, onTouchEnd} = useTouchDnD();
 
 export default class Task extends HTMLElement {
 	id = '';
@@ -43,13 +38,6 @@ export default class Task extends HTMLElement {
 		this.getTaskAttributes();
 		this.buildTemplate();
 		this.taskTools.addEventListener('click', this.onTaskToolsClick.bind(this));
-
-		// this.addEventListener('dragstart', onDragStart);
-		// this.addEventListener('dragend', onDragEnd);
-		//
-		// this.addEventListener('touchstart', onTouchStart);
-		// this.addEventListener('touchmove', onTouchMove);
-		// this.addEventListener('touchend', onTouchEnd);
 	}
 
 	buildTemplate() {
