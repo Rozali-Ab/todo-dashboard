@@ -1,9 +1,11 @@
-import {store} from '../app';
 import {getUserData, removeColumn, removeTask, setColumn, setTask} from '../firebase/data.ts';
 import {useForm} from '../components/forms/useForm.ts';
 import type {ColumnType, TaskType, UserType} from '../types/types.ts';
+import Store from './Store.ts';
 
 const {showColumnForm, showTaskForm} = useForm();
+
+const store = new Store();
 
 let tasks: TaskType[] = [];
 let columns: ColumnType[] = [];
@@ -136,6 +138,9 @@ export const useStore = () => {
 		if (!currentUser) return;
 
 		if (updatedTask) {
+
+			if (updatedTask.parentColumnId === parentId.toString()) return;
+
 			updatedTask.parentColumnId = parentId;
 
 			await updateTaskOnServer(updatedTask);
@@ -146,6 +151,8 @@ export const useStore = () => {
 		const updatedTask = findTaskById(id);
 
 		if (updatedTask) {
+
+			if (updatedTask.order === order.toString()) return;
 
 			updatedTask.order = order.toString();
 
@@ -278,6 +285,7 @@ export const useStore = () => {
 	};
 
 	return {
+		store,
 		createTask,
 		createColumn,
 		removeTaskById,
