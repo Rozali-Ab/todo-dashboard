@@ -1,12 +1,14 @@
+import Sortable from 'sortablejs';
+
 import Task from '../Task/Task.ts';
 import {confirmDeleteColumn} from './utils/confirmDeleteColumn.ts';
-import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../../constants/events.ts';
+import {COLUMN_TOOLS_EVENTS, DASHBOARD_EVENTS} from '../../../constants/events.ts';
 import type {ColumnType, TaskType} from '../../../types/types.ts';
 
 export default class Column extends HTMLElement {
 	id = '';
 	title = '';
-	taskArray: TaskType[] = [];
+
 	columnTools = document.createElement('div');
 	columnHeader = document.createElement('div');
 	columnTitle = document.createElement('div');
@@ -37,29 +39,51 @@ export default class Column extends HTMLElement {
 		this.getColumnAttributes();
 		this.buildTemplate();
 		this.columnTools.addEventListener('click', this.onColumnToolsClick.bind(this));
-		this.columnBody.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => this.removeTask(evt as CustomEvent));
+		this.initSortable();
+	}
+
+	initSortable() {
+		new Sortable(this.columnBody, {
+			group: 'tasks',
+			animation: 150,
+			ghostClass: 'ghost',
+
+			//если добавилась новая таска, отправляем event и пересчитываем order у тасок
+			onAdd: this.dropTaskEvent.bind(this),
+			//если перемещение таски внутри одной колонки, пересчитываем order у тасок
+			onSort: this.updateTasksOrders.bind(this),
+			//если таска ушла из колонки, пересчитываем order у оставшихся тасок
+			onRemove: this.updateTasksOrders.bind(this)
+		});
+	}
+
+	dropTaskEvent(evt: Sortable.SortableEvent) {
+
+		const event = new CustomEvent(DASHBOARD_EVENTS.DROP_TASK, {
+			bubbles: true,
+			detail: {
+				taskId: evt.item.id,
+				parentId: this.id
+			}
+		});
+
+		this.dispatchEvent(event);
+		this.updateTasksOrders();
+	}
+
+	updateTasksOrders() {
+
+		Array.from(this.columnBody.children).forEach((element, index) => {
+			(element as Task).updateTaskOrder((index + 1).toString());
+		});
 	}
 
 	appendTask(task: TaskType) {
-
-		this.taskArray.push(task);
 
 		const taskComponent = new Task(task);
 		this.columnBody.append(taskComponent);
 
 		return taskComponent;
-	}
-
-	removeTask(evt: CustomEvent) {
-
-		const taskId = evt.detail.id;
-
-		this.removeTaskById(taskId);
-	}
-
-	removeTaskById(taskId: string) {
-		const index = this.taskArray.findIndex((task) => task.id === taskId);
-		this.taskArray.splice(index, 1);
 	}
 
 	buildTemplate() {
@@ -91,16 +115,16 @@ export default class Column extends HTMLElement {
 		if (!currentAction || !Object.values(COLUMN_TOOLS_EVENTS).includes(currentAction)) return;
 
 		const {id} = this;
-		const isEmpty = this.taskArray.length === 0;
 
 		const event = new CustomEvent(currentAction, {
 			bubbles: true,
-			detail: {id, isEmpty}
+			detail: {id}
 		});
 
 		if (currentAction === COLUMN_TOOLS_EVENTS.REMOVE_COLUMN) {
 
-			if (this.taskArray.length > 0) {
+			//если есть таски, подтверждаем удаление всех тасок вместе с колонкой
+			if (this.columnBody.children.length) {
 
 				const confirmed = await confirmDeleteColumn();
 

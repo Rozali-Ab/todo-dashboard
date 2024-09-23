@@ -4,19 +4,18 @@ import type {TaskType} from '../../../types/types.ts';
 export default class Task extends HTMLElement {
 	id = '';
 	title = '';
-	parent = '';
 	order = '';
 	isDone = false;
+
 	taskTitle = document.createElement('div');
 	taskTools = document.createElement('div');
-	taskCheckbox = document.createElement('input'); // Создаем чекбокс
+	taskCheckbox = document.createElement('input');
 
-	constructor({id, title, parentColumnId, order, isDone}: TaskType) {
+	constructor({id = '', title = '', order = '0', isDone = false}: Partial<TaskType> = {}) {
 		super();
-		this.id = id.toString();
-		this.title = title;
-		this.parent = parentColumnId.toString();
-		this.order = order.toString();
+		this.id = id.toString() || '';
+		this.title = title || '';
+		this.order = order.toString() || '0';
 		this.isDone = isDone;
 
 		this.setTaskAttributes();
@@ -29,7 +28,7 @@ export default class Task extends HTMLElement {
 
 	getTaskAttributes() {
 		if (!this.id) {
-			this.id = this.getAttribute('id')!;
+			this.id = this.getAttribute('id') || '0';
 		}
 	}
 
@@ -108,8 +107,21 @@ export default class Task extends HTMLElement {
 		}, 300);
 	}
 
-	updateTaskParent(newParentId: string) {
-		this.parent = newParentId;
+	//если order изменился, отправляем событие в Dashboard, оттуда в store и на сервер
+	updateTaskOrder(newOrder: string) {
+		if (this.order === newOrder.toString()) return;
+
+		this.order = newOrder;
+
+		const event = new CustomEvent(TASK_TOOLS_EVENTS.UPDATE_ORDER, {
+			bubbles: true,
+			detail: {
+				taskId: this.id,
+				order: this.order
+			}
+		});
+
+		this.dispatchEvent(event);
 	}
 }
 
