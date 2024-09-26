@@ -2,13 +2,8 @@ import Column from './Column/Column.ts';
 import Task from './Task/Task.ts';
 import Store from '../../store/Store.ts';
 import {useStore} from '../../store/useStore.ts';
-import {useDnD} from './useDnD.ts';
-import {useTouchDnD} from './useTouchDnD.ts';
-import {COLUMN_TOOLS_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/events.ts';
+import {COLUMN_TOOLS_EVENTS, DASHBOARD_EVENTS, TASK_TOOLS_EVENTS} from '../../constants/events.ts';
 import type {ColumnType, TaskType} from '../../types/types.ts';
-
-const {onDragStart, onDragEnter, onDragEnd} = useDnD();
-const {onTouchStart, onTouchMove, onTouchEnd} = useTouchDnD();
 
 const {
 	createTask,
@@ -17,7 +12,9 @@ const {
 	removeAllTasksByParentId,
 	updateTaskStatus,
 	updateColumnTitle,
-	updateTaskTitle
+	updateTaskTitle,
+	updateTaskParentId,
+	updateTaskOrder
 } = useStore();
 
 export default class Dashboard extends HTMLElement {
@@ -30,10 +27,11 @@ export default class Dashboard extends HTMLElement {
 		this.columns = [];
 		this.tasks = [];
 
-		this.buildTemplate();
 	}
 
 	connectedCallback() {
+
+		this.buildTemplate();
 		this.addEventListeners();
 	}
 
@@ -46,19 +44,28 @@ export default class Dashboard extends HTMLElement {
 		this.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, this.removeTask.bind(this));
 		this.addEventListener(TASK_TOOLS_EVENTS.EDIT_TASK, this.editTask.bind(this));
 		this.addEventListener(TASK_TOOLS_EVENTS.IS_DONE_TASK, this.handleTaskCheckbox.bind(this));
+		this.addEventListener(TASK_TOOLS_EVENTS.UPDATE_ORDER, this.handleTaskOrder.bind(this));
 
-		this.addEventListener('dragstart', onDragStart);
-		this.addEventListener('dragenter', onDragEnter);
-		this.addEventListener('dragend', onDragEnd);
-
-		this.addEventListener('touchstart', onTouchStart);
-		this.addEventListener('touchmove', onTouchMove);
-		this.addEventListener('touchend', onTouchEnd);
+		this.addEventListener(DASHBOARD_EVENTS.DROP_TASK, this.onDropTask.bind(this));
 	}
 
 	buildTemplate() {
 		this.setAttribute('id', 'dashboard');
 		this.classList.add('dashboard');
+	}
+
+	async onDropTask(evt: Event) {
+		const {detail} = evt as CustomEvent;
+		const {taskId, parentId} = detail;
+
+		await updateTaskParentId(taskId, parentId);
+	}
+
+	async handleTaskOrder(evt: Event) {
+		const {detail} = evt as CustomEvent;
+		const {taskId, order} = detail;
+
+		await updateTaskOrder(taskId, order);
 	}
 
 	renderColumnsAndTasks() {

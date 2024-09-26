@@ -1,10 +1,10 @@
-import Store from '../store/Store.ts';
 import Dashboard from '../components/dashboard/Dashboard.ts';
 import NavBar from '../components/NavBar/NavBar.ts';
 import Loader from '../components/Loader/Loader.ts';
 import {showMessage} from '../utils/showMessage.ts';
+import {useStore} from '../store/useStore.ts';
 
-export const store = new Store();
+const {store} = useStore();
 
 const loader = new Loader();
 const navBar = new NavBar();

@@ -1,4 +1,3 @@
-import {store} from '../../app';
 import {fetchUserData, useStore} from '../../store/useStore.ts';
 import {useForm} from '../forms/useForm.ts';
 import Store from '../../store/Store.ts';
@@ -6,7 +5,7 @@ import {registerUser, signInUser} from '../../firebase/auth.ts';
 import type {UserType} from '../../types/types.ts';
 import {showMessage} from '../../utils/showMessage.ts';
 
-const {createColumn} = useStore();
+const {store, createColumn} = useStore();
 
 const {showAuthForm, showRegistrationForm} = useForm();
 
