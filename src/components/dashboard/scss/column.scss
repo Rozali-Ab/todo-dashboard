@@ -84,10 +84,24 @@
 }
 
 .modal-message {
+  @include fd-column;
   @include shadow-box;
   width: 300px;
   padding: 1em;
+  text-align: center;
+  font-weight: bolder;
+  background-color: $app-accent-color;
   border-radius: $radius;
+
+  .modal-buttons {
+    @include fd-row;
+    justify-content: center;
+    margin: 1rem 0;
+
+    button {
+      margin-right: 1rem;
+    }
+  }
 }
 
 .ghost {

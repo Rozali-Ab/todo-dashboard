@@ -7,8 +7,11 @@ export const confirmDeleteColumn = async (): Promise<boolean> => {
 	const content = document.createElement('div');
 	content.classList.add('modal-message');
 
-	const message = document.createElement('p');
-	message.textContent = 'Remove Column with all tasks?';
+	const message = document.createElement('div');
+	message.textContent = 'Delete list with all tasks?';
+
+	const buttons = document.createElement('div');
+	buttons.classList.add('modal-buttons');
 
 	const answerNo = document.createElement('button');
 	answerNo.textContent = 'No';
@@ -16,7 +19,9 @@ export const confirmDeleteColumn = async (): Promise<boolean> => {
 	const answerYes = document.createElement('button');
 	answerYes.textContent = 'Yes';
 
-	content.append(message, answerNo, answerYes);
+	buttons.append(answerNo, answerYes);
+
+	content.append(message, buttons);
 
 	modal.appendContent(content);
 
