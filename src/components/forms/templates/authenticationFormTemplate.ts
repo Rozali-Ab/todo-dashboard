@@ -1,10 +1,8 @@
 export const authenticationFormTemplate = () => {
 	const form = document.createElement('form');
-	form.classList.add('form-auth');
 
 	form.innerHTML = `
-		<h4>Login</h4>
-		<label for="email">
+		<label for="email">Login
 			<input
 				name="email"
 				type="email"
@@ -12,7 +10,7 @@ export const authenticationFormTemplate = () => {
 				required
 			>
 		</label>
-				<label for="password">
+		<label for="password">
 			<input
 				name="password"
 				type="password"
@@ -20,14 +18,11 @@ export const authenticationFormTemplate = () => {
 				required
 			>
 		</label>
-		<div>
+		<div class="form-buttons">
 			<button type="button" id="cancel">Cancel</button>
-			<button type="reset" id="reset">Clear</button>
 			<button type="submit">Login</button>
 		</div>
 	`;
-
-	form.name = 'auth-form';
 
 	return form;
 };

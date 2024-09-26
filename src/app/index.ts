@@ -19,9 +19,10 @@ const initApp = async () => {
 
 	const main = document.createElement('main');
 	main.classList.add('container');
-	document.body.prepend(main);
 
-	main.prepend(navBar);
+	document.body.prepend(main);
+	document.body.prepend(navBar);
+
 	main.append(dashboard);
 	main.append(loader);
 };

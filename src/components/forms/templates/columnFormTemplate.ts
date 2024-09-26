@@ -1,10 +1,8 @@
 export const columnFormTemplate = (title?: string): HTMLFormElement => {
-	const isNew = title ? '' : 'New';
+	const isNew = title ? 'Update' : 'New';
 	const columnTitle = title ? title : '';
 
 	const form = document.createElement('form');
-	form.classList.add('form-new-column');
-	form.setAttribute('id', 'form-new-column');
 
 	form.innerHTML = `
 		<label class="form-new-column__label" for="title">${isNew} column title

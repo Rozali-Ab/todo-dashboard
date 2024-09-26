@@ -7,10 +7,12 @@ export default class Column extends HTMLElement {
 	id = '';
 	title = '';
 	taskArray: TaskType[] = [];
-	columnTools = document.createElement('div');
+
 	columnHeader = document.createElement('div');
 	columnTitle = document.createElement('div');
 	columnBody = document.createElement('div');
+	addTask = document.createElement('div');
+	deleteList = document.createElement('div');
 
 	constructor({id, title}: ColumnType) {
 
@@ -36,7 +38,7 @@ export default class Column extends HTMLElement {
 
 		this.getColumnAttributes();
 		this.buildTemplate();
-		this.columnTools.addEventListener('click', this.onColumnToolsClick.bind(this));
+		this.addEventListener('click', this.onColumnToolsClick.bind(this));
 		this.columnBody.addEventListener(TASK_TOOLS_EVENTS.REMOVE_TASK, (evt) => this.removeTask(evt as CustomEvent));
 	}
 
@@ -67,21 +69,31 @@ export default class Column extends HTMLElement {
 		this.classList.add('column-component');
 		this.columnHeader.classList.add('column-component-header');
 		this.columnTitle.classList.add('column-component-title');
+		this.columnTitle.dataset.actionType = COLUMN_TOOLS_EVENTS.EDIT_COLUMN;
 		this.columnBody.classList.add('column-component-body');
 
-		this.columnTools.classList.add('column-tools');
-		this.columnTools.innerHTML = `
-      <button class="column-tools__add" data-action-type=${COLUMN_TOOLS_EVENTS.ADD_TASK}>add task</button>
-      <button class="column-tools__rename" data-action-type=${COLUMN_TOOLS_EVENTS.EDIT_COLUMN}>edit</button>
-      <button class="column-tools__remove" data-action-type=${COLUMN_TOOLS_EVENTS.REMOVE_COLUMN}>remove</button>
+		this.addTask.dataset.actionType = COLUMN_TOOLS_EVENTS.ADD_TASK;
+		this.addTask.classList.add('add-task');
+		this.addTask.innerHTML = `
+     <img src="https://cdn-icons-png.freepik.com/256/17338/17338561.png?ga=GA1.1.1496496612.1674736423" alt="add task">
+     Add new task
 		`;
 
-		this.columnTitle.textContent = this.title;
-		this.columnHeader.append(this.columnTools);
-		this.columnHeader.append(this.columnTitle);
+		this.deleteList.dataset.actionType = COLUMN_TOOLS_EVENTS.REMOVE_COLUMN;
+		this.deleteList.innerHTML =
+			`<div class="delete-column" data-action-type=${COLUMN_TOOLS_EVENTS.REMOVE_COLUMN}>
+      	<img src="https://cdn-icons-png.freepik.com/256/12765/12765258.png?ga=GA1.1.1496496612.1674736423" alt="remove list">
+      </div>
+			`;
+
+		this.columnTitle.innerHTML = `
+			${this.title}
+			<img src="https://cdn-icons-png.freepik.com/256/8861/8861212.png?ga=GA1.1.1496496612.1674736423" alt="edit title">
+		`;
+		this.columnHeader.append(this.columnTitle, this.addTask);
 
 		this.prepend(this.columnHeader);
-		this.append(this.columnBody);
+		this.append(this.columnBody, this.deleteList);
 	}
 
 	async onColumnToolsClick(evt: MouseEvent) {

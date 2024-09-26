@@ -1,15 +1,28 @@
 .dashboard {
+  position: relative;
   display: flex;
-  margin: 0 -1rem;
   flex-wrap: wrap;
   align-items: flex-start;
+  margin: 0 auto;
+  max-width: 1900px;
 
-  @media (max-width: 630px) {
-    margin: 0 auto;
+  @media (max-width: 1650px) {
+    width: clamp(350px, 80%, 1550px);
+  }
+
+  @media (max-width: 1550px) {
+    width: 1240px;
+  }
+
+  @media (max-width: 1250px) {
+    width: 930px;
+  }
+
+  @media (max-width: 950px) {
+    width: 620px;
+  }
+  @media (max-width: 650px) {
+    width: 350px;
     justify-content: center;
   }
-}
-
-task-component, column-component {
-  display: block;
 }

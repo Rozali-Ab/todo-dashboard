@@ -2,7 +2,6 @@ import {store} from '../../app';
 import {fetchUserData, useStore} from '../../store/useStore.ts';
 import {useForm} from '../forms/useForm.ts';
 import Store from '../../store/Store.ts';
-import AppModal from '../AppModal/AppModal.ts';
 import {registerUser, signInUser} from '../../firebase/auth.ts';
 import type {UserType} from '../../types/types.ts';
 import {showMessage} from '../../utils/showMessage.ts';
@@ -11,12 +10,14 @@ const {createColumn} = useStore();
 
 const {showAuthForm, showRegistrationForm} = useForm();
 
-const modal = new AppModal();
-
 export default class NavBar extends HTMLElement {
+	appLogo = document.createElement('div');
+	logoImg = document.createElement('img');
+	navButtons = document.createElement('div');
 	loginButton = document.createElement('button');
 	addColumnButton = document.createElement('button');
 	logoutButton = document.createElement('button');
+	createAccountButton = document.createElement('button');
 
 	constructor() {
 		super();
@@ -25,47 +26,30 @@ export default class NavBar extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.loginButton.addEventListener('click', this.handleLogin.bind(this));
+		this.loginButton.addEventListener('click', this.authenticationUser.bind(this));
 		this.logoutButton.addEventListener('click', this.handleLogout.bind(this));
 		this.addColumnButton.addEventListener('click', this.handleAddColumn.bind(this));
+		this.createAccountButton.addEventListener('click', this.registrationUser.bind(this));
 	}
 
 	buildTemplate() {
-
+		this.appLogo.classList.add('app-logo');
+		this.logoImg.src = 'https://cdn-icons-png.freepik.com/256/17360/17360881.png?ga=GA1.1.1496496612.1674736423&semt=ais_hybrid';
+		this.navButtons.classList.add('nav-buttons');
 		this.loginButton.textContent = 'Login';
 		this.logoutButton.textContent = 'Logout';
-		this.addColumnButton.textContent = 'Add Column';
-
-		this.loginButton.classList.add('login-btn');
-		this.addColumnButton.classList.add('add-column-btn');
+		this.addColumnButton.textContent = 'Add New List';
+		this.createAccountButton.textContent = 'Create Account';
 
 		this.logoutButton.style.display = 'none';
 		this.addColumnButton.style.display = 'none';
 
-		this.appendChild(this.loginButton);
-		this.appendChild(this.addColumnButton);
-		this.appendChild(this.logoutButton);
+		this.appLogo.appendChild(this.logoImg);
 
-	}
+		this.navButtons.append(this.loginButton, this.addColumnButton, this.logoutButton, this.createAccountButton);
 
-	handleLogin() {
-
-		const content = document.createElement('div');
-		content.classList.add('modal-message');
-		content.textContent = 'Already have an account?';
-
-		const answerYes = document.createElement('button');
-		answerYes.textContent = 'Yes';
-
-		const answerNo = document.createElement('button');
-		answerNo.textContent = 'No';
-
-		content.append(answerYes, answerNo);
-		modal.appendContent(content);
-		modal.open();
-
-		answerNo.addEventListener('click', this.registrationUser.bind(this));
-		answerYes.addEventListener('click', this.authenticationUser.bind(this));
+		this.appendChild(this.appLogo);
+		this.appendChild(this.navButtons);
 	}
 
 	async handleAddColumn() {
@@ -74,7 +58,6 @@ export default class NavBar extends HTMLElement {
 	}
 
 	async authenticationUser() {
-		modal.close();
 		const formData = await showAuthForm();
 
 		if (formData) {
@@ -101,7 +84,6 @@ export default class NavBar extends HTMLElement {
 	}
 
 	async registrationUser() {
-		modal.close();
 
 		const formData = await showRegistrationForm();
 
@@ -135,8 +117,10 @@ export default class NavBar extends HTMLElement {
 			this.loginButton.style.display = 'none';
 			this.addColumnButton.style.display = 'inline-block';
 			this.logoutButton.style.display = 'inline-block';
+			this.createAccountButton.style.display = 'none';
 		} else {
 			this.loginButton.style.display = 'inline-block';
+			this.createAccountButton.style.display = 'inline-block';
 			this.logoutButton.style.display = 'none';
 			this.addColumnButton.style.display = 'none';
 		}

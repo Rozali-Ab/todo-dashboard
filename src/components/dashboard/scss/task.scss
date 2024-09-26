@@ -3,29 +3,15 @@
   @include shadow-box;
   position: relative;
   width: 100%;
-  max-width: 270px;
-  min-height: 50px;
   background-color: $task-background-color;
-  margin-top: .5rem;
+  margin: .6rem 0;
 
   opacity: 1;
   transition: all .3s ease-in-out;
 
-  input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
-    border: 1px #636363 solid;
-    border-radius: 10px;
-
-    &:checked {
-      background-color: rgba(65, 126, 167, 0.5882352941);
-    }
-  }
-
-  &--done {
-    text-decoration: line-through;
-    color: #636363;
+  img {
+    width: 30px;
+    pointer-events: none;
   }
 
   &:hover {
@@ -33,10 +19,12 @@
   }
 
   &-title {
+    width: 80%;
+    padding: 0 0 1rem 1rem;
     margin-top: .5rem;
     font-size: 2rem;
     word-break: break-all;
-    pointer-events: none;
+    //pointer-events: none;
   }
 
   &-tools {
@@ -47,61 +35,57 @@
     align-items: center;
     right: 0;
     font-size: 1.2rem;
+    height: 100%;
+    cursor: pointer;
+
+    img {
+      display: block;
+      width: 15px;
+      height: 15px;
+      filter: brightness(0) saturate(100%) invert(76%) sepia(4%) saturate(26%) hue-rotate(314deg) brightness(88%) contrast(91%);
+    }
+
+    &--wrapper {
+      @include fd-column;
+      height: 100%;
+      width: 50px;
+      padding: .5rem;
+    }
 
     &__remove {
-      border-radius: 0;
-      width: 10px;
-      height: 15px;
-      background-color: rgba(255, 255, 255, 0);
-      background-image: url('/src/assets/svg/trash.svg');
-      background-repeat: no-repeat;
-      filter: sepia(70%);
-      transition: transform 0.3s ease-in-out;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0);
-        box-shadow: none;
-        transform: scale(1.3);
-      }
+      display: flex;
+      justify-content: flex-end;
+      align-items: end;
+      height: 50%;
+      width: 100%;
     }
 
     &__edit {
-      position: relative;
-      cursor: text;
-      transition: transform 0.3s ease-in-out;
-      background-color: rgba(255, 255, 255, 0);
-      color: $app-text-color-extra;
+      display: flex;
+      justify-content: flex-end;
+      align-items: start;
+      height: 50%;
+      width: 100%;
+    }
 
-      &:hover {
-        transform: scale(1.1);
-        color: #fff;
-      }
+    .is-task-done {
+      width: 50%;
     }
   }
 
-  &--drag-target {
-    opacity: 0;
-    padding: 0;
-    min-height: 0;
-    margin-bottom: 0;
-    font-size: 0;
+  .task.remove {
     user-select: none;
-    cursor: grabbing;
-  }
-}
-
-.task.remove {
-  user-select: none;
-  animation: remove-task .5s ease;
-}
-
-@keyframes remove-task {
-  0% {
-    opacity: .5;
+    animation: remove-task .5s ease;
   }
 
-  100% {
-    transform: translateX(2000px);
-    opacity: 0;
+  @keyframes remove-task {
+    0% {
+      opacity: .5;
+    }
+
+    100% {
+      transform: translateX(2000px);
+      opacity: 0;
+    }
   }
 }

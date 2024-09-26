@@ -1,10 +1,8 @@
 export const registrationFormTemplate = () => {
 	const form = document.createElement('form');
-	form.classList.add('form-auth');
 
 	form.innerHTML = `
-		<h4>Create new account</h4>
-		<label for="id">
+		<label for="id"> Create new account
 			<input 
 				name="id"
 				type="number"
@@ -37,14 +35,11 @@ export const registrationFormTemplate = () => {
 				minlength="6"
 			>
 		</label>
-		<div>
+		<div class="form-buttons">
 			<button type="button" id="cancel">Cancel</button>
-			<button type="reset" id="reset">Clear</button>
 			<button type="submit">Create</button>
 		</div>
 	`;
-
-	form.name = 'auth-form';
 
 	return form;
 };

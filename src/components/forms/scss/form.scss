@@ -1,0 +1,37 @@
+form {
+  @include fd-column;
+  width: 300px;
+  padding: 3rem 2rem;
+  border-radius: $radius;
+  background: $app-accent-color;
+
+  label {
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    font-weight: bolder;
+  }
+
+  input {
+    width: 100%;
+    height: 5rem;
+    padding: .5rem;
+    margin: 2rem 0;
+    border: none;
+    border-radius: $radius;
+    outline: none;
+    font-size: 1.5rem;
+    background-color: #fff;
+    box-shadow: inset 0 0 10px rgba(#000000b4, 0.2);
+
+    &::placeholder {
+      text-transform: lowercase;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}

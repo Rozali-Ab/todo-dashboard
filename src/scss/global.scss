@@ -10,19 +10,23 @@
 
 html {
   font-size: 10px;
-  height: 100%;
 }
 
 body {
-  @include app-background;
-  width: 100%;
-  height: 100%;
   position: relative;
   font-size: 1.5rem;
   margin: 0;
   padding: 0;
-  backdrop-filter: blur(10px);
   color: $app-text-color;
+  background-color: rgb(39, 39, 39);
+}
+
+main {
+  margin-top: 2rem;
+}
+
+dashboard-component, task-component, column-component {
+  display: block;
 }
 
 button {
@@ -33,25 +37,8 @@ input, textarea, button {
   appearance: none;
 }
 
-.container {
-  padding: 1rem;
-  max-width: 160rem;
-  margin: 0 auto;
-  width: 100%;
-
-  @media (max-width: 630px) {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-  }
-}
-
 .hide {
   display: none;
-}
-
-.blur {
-  filter: blur(3px);
 }
 
 .error {
@@ -66,4 +53,13 @@ input, textarea, button {
   transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
   border-radius: 10px;
   z-index: 1000;
+}
+
+dialog[open] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+  background: none;
 }
