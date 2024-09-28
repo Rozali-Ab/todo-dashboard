@@ -1,5 +1,5 @@
 import {fetchUserData, useStore} from '../../store/useStore.ts';
-import {useForm} from '../forms/useForm.ts';
+import {useForm} from '../AppModal/forms/useForm.ts';
 import Store from '../../store/Store.ts';
 import {registerUser, signInUser} from '../../firebase/auth.ts';
 import type {UserType} from '../../types/types.ts';
@@ -7,7 +7,7 @@ import {showMessage} from '../../utils/showMessage.ts';
 
 const {store, createColumn} = useStore();
 
-const {showAuthForm, showRegistrationForm} = useForm();
+const {showAuthForm, form, modal} = useForm();
 
 export default class NavBar extends HTMLElement {
 	appLogo = document.createElement('div');
@@ -16,7 +16,8 @@ export default class NavBar extends HTMLElement {
 	loginButton = document.createElement('button');
 	addColumnButton = document.createElement('button');
 	logoutButton = document.createElement('button');
-	createAccountButton = document.createElement('button');
+
+	//createAccountButton = document.createElement('button');
 
 	constructor() {
 		super();
@@ -25,10 +26,10 @@ export default class NavBar extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.loginButton.addEventListener('click', this.authenticationUser.bind(this));
+		this.loginButton.addEventListener('click', this.authenticationOrRegistrationUser.bind(this));
 		this.logoutButton.addEventListener('click', this.handleLogout.bind(this));
 		this.addColumnButton.addEventListener('click', this.handleAddColumn.bind(this));
-		this.createAccountButton.addEventListener('click', this.registrationUser.bind(this));
+		//this.createAccountButton.addEventListener('click', this.registrationUser.bind(this));
 	}
 
 	buildTemplate() {
@@ -38,14 +39,14 @@ export default class NavBar extends HTMLElement {
 		this.loginButton.textContent = 'Login';
 		this.logoutButton.textContent = 'Logout';
 		this.addColumnButton.textContent = 'Add New List';
-		this.createAccountButton.textContent = 'Create Account';
+		//this.createAccountButton.textContent = 'Create Account';
 
 		this.logoutButton.style.display = 'none';
 		this.addColumnButton.style.display = 'none';
 
 		this.appLogo.appendChild(this.logoImg);
 
-		this.navButtons.append(this.loginButton, this.addColumnButton, this.logoutButton, this.createAccountButton);
+		this.navButtons.append(this.loginButton, this.addColumnButton, this.logoutButton);
 
 		this.appendChild(this.appLogo);
 		this.appendChild(this.navButtons);
@@ -56,10 +57,11 @@ export default class NavBar extends HTMLElement {
 
 	}
 
-	async authenticationUser() {
+	async authenticationOrRegistrationUser() {
 		const formData = await showAuthForm();
 
 		if (formData) {
+
 			const user: UserType = {
 				email: formData.email,
 				password: formData.password,
@@ -68,43 +70,47 @@ export default class NavBar extends HTMLElement {
 				columns: [],
 			};
 
-			try {
+			if (formData.registration) {
 
-				const userId = await signInUser(user);
-				const userData = await fetchUserData(userId);
-
-				if (userData) {
-					store.login(userData);
-				}
-			} catch (err) {
-				showMessage('Wrong email or password');
+				await this.registrationUser(user);
+				return;
 			}
+
+			await this.authenticationUser(user);
+		}
+
+	}
+
+	async registrationUser(userData: UserType) {
+
+		try {
+			userData.id = await registerUser(userData);
+
+			store.login(userData);
+
+			form.reset();
+			modal.close();
+		} catch (err) {
+			showMessage('Use another email. ' + userData.email + ' is busy');
 		}
 	}
 
-	async registrationUser() {
+	async authenticationUser(user: UserType) {
+		try {
 
-		const formData = await showRegistrationForm();
+			const userId = await signInUser(user);
+			const userData = await fetchUserData(userId);
 
-		if (formData) {
-			const newUser: UserType = {
-				username: formData.username,
-				email: formData.email,
-				password: formData.password,
-				id: '',
-				tasks: [],
-				columns: [],
-			};
+			if (userData) {
+				store.login(userData);
 
-			try {
-				newUser.id = await registerUser(newUser);
-
-				store.login(newUser);
-			} catch (err) {
-				showMessage('Use another email');
+				form.reset();
+				form.name = '';
+				modal.close();
 			}
+		} catch (err) {
+			showMessage('Wrong email or password');
 		}
-
 	}
 
 	async handleLogout() {
@@ -116,10 +122,10 @@ export default class NavBar extends HTMLElement {
 			this.loginButton.style.display = 'none';
 			this.addColumnButton.style.display = 'inline-block';
 			this.logoutButton.style.display = 'inline-block';
-			this.createAccountButton.style.display = 'none';
+			//this.createAccountButton.style.display = 'none';
 		} else {
 			this.loginButton.style.display = 'inline-block';
-			this.createAccountButton.style.display = 'inline-block';
+			//this.createAccountButton.style.display = 'inline-block';
 			this.logoutButton.style.display = 'none';
 			this.addColumnButton.style.display = 'none';
 		}
