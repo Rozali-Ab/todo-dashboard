@@ -1,7 +1,5 @@
 export const authenticationFormTemplate = () => {
-	const form = document.createElement('form');
-
-	form.innerHTML = `
+	return `
 		<label for="email">Login
 			<input
 				name="email"
@@ -20,9 +18,9 @@ export const authenticationFormTemplate = () => {
 		</label>
 		<div class="form-buttons">
 			<button type="button" id="cancel">Cancel</button>
-			<button type="submit">Login</button>
+			<button type="button" id="authentication">Auth</button>
 		</div>
+		<br><hr><br>
+ 		<button type="button" id="registration" >Create an account</button>
 	`;
-
-	return form;
 };

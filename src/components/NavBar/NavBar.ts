@@ -1,13 +1,10 @@
-import {fetchUserData, useStore} from '../../store/useStore.ts';
+import {useStore} from '../../store/useStore.ts';
 import {useForm} from '../forms/useForm.ts';
 import Store from '../../store/Store.ts';
-import {registerUser, signInUser} from '../../firebase/auth.ts';
-import type {UserType} from '../../types/types.ts';
-import {showMessage} from '../../utils/showMessage.ts';
 
 const {store, createColumn} = useStore();
 
-const {showAuthForm, showRegistrationForm} = useForm();
+const {showAuthForm} = useForm();
 
 export default class NavBar extends HTMLElement {
 	appLogo = document.createElement('div');
@@ -16,7 +13,6 @@ export default class NavBar extends HTMLElement {
 	loginButton = document.createElement('button');
 	addColumnButton = document.createElement('button');
 	logoutButton = document.createElement('button');
-	createAccountButton = document.createElement('button');
 
 	constructor() {
 		super();
@@ -25,10 +21,9 @@ export default class NavBar extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.loginButton.addEventListener('click', this.authenticationUser.bind(this));
+		this.loginButton.addEventListener('click', showAuthForm);
 		this.logoutButton.addEventListener('click', this.handleLogout.bind(this));
 		this.addColumnButton.addEventListener('click', this.handleAddColumn.bind(this));
-		this.createAccountButton.addEventListener('click', this.registrationUser.bind(this));
 	}
 
 	buildTemplate() {
@@ -38,14 +33,13 @@ export default class NavBar extends HTMLElement {
 		this.loginButton.textContent = 'Login';
 		this.logoutButton.textContent = 'Logout';
 		this.addColumnButton.textContent = 'Add New List';
-		this.createAccountButton.textContent = 'Create Account';
 
-		this.logoutButton.style.display = 'none';
-		this.addColumnButton.style.display = 'none';
+		this.logoutButton.hidden = true;
+		this.addColumnButton.hidden = true;
 
 		this.appLogo.appendChild(this.logoImg);
 
-		this.navButtons.append(this.loginButton, this.addColumnButton, this.logoutButton, this.createAccountButton);
+		this.navButtons.append(this.loginButton, this.addColumnButton, this.logoutButton);
 
 		this.appendChild(this.appLogo);
 		this.appendChild(this.navButtons);
@@ -56,72 +50,19 @@ export default class NavBar extends HTMLElement {
 
 	}
 
-	async authenticationUser() {
-		const formData = await showAuthForm();
-
-		if (formData) {
-			const user: UserType = {
-				email: formData.email,
-				password: formData.password,
-				id: '',
-				tasks: [],
-				columns: [],
-			};
-
-			try {
-
-				const userId = await signInUser(user);
-				const userData = await fetchUserData(userId);
-
-				if (userData) {
-					store.login(userData);
-				}
-			} catch (err) {
-				showMessage('Wrong email or password');
-			}
-		}
-	}
-
-	async registrationUser() {
-
-		const formData = await showRegistrationForm();
-
-		if (formData) {
-			const newUser: UserType = {
-				username: formData.username,
-				email: formData.email,
-				password: formData.password,
-				id: '',
-				tasks: [],
-				columns: [],
-			};
-
-			try {
-				newUser.id = await registerUser(newUser);
-
-				store.login(newUser);
-			} catch (err) {
-				showMessage('Use another email');
-			}
-		}
-
-	}
-
 	async handleLogout() {
 		await store.logout();
 	}
 
 	updateUI(state: Store) {
 		if (state.isAuth) {
-			this.loginButton.style.display = 'none';
-			this.addColumnButton.style.display = 'inline-block';
-			this.logoutButton.style.display = 'inline-block';
-			this.createAccountButton.style.display = 'none';
+			this.loginButton.hidden = true;
+			this.addColumnButton.hidden = false;
+			this.logoutButton.hidden = false;
 		} else {
-			this.loginButton.style.display = 'inline-block';
-			this.createAccountButton.style.display = 'inline-block';
-			this.logoutButton.style.display = 'none';
-			this.addColumnButton.style.display = 'none';
+			this.loginButton.hidden = false;
+			this.logoutButton.hidden = true;
+			this.addColumnButton.hidden = true;
 		}
 	}
 
