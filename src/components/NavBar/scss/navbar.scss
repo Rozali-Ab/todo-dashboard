@@ -9,9 +9,10 @@ nav-bar {
   justify-content: space-between;
   padding: 1rem;
   margin-bottom: 2rem;
-  background-color: rgb(39, 39, 39);
-  border-radius: 0 0 $radius $radius;
-  box-shadow: 0 2px 5px 5px rgba(0, 204, 204, 0.6);
+  background-color: $app-background-color;
+  border: 1px solid #3d444d;
+  //border-radius: 0 0 $radius $radius;
+  //box-shadow: 0 2px 5px 5px rgba(0, 204, 204, 0.6);
   z-index: 2;
 }
 

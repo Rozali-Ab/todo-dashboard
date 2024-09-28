@@ -92,6 +92,7 @@ export default class NavBar extends HTMLElement {
 			modal.close();
 		} catch (err) {
 			showMessage('Use another email. ' + userData.email + ' is busy');
+			await this.authenticationOrRegistrationUser();
 		}
 	}
 
@@ -110,8 +111,34 @@ export default class NavBar extends HTMLElement {
 			}
 		} catch (err) {
 			showMessage('Wrong email or password');
+			await this.authenticationOrRegistrationUser();
 		}
 	}
+
+	// async registrationUser() {
+	//
+	// 	const formData = await showRegistrationForm();
+	//
+	// 	if (formData) {
+	// 		const newUser: UserType = {
+	// 			username: formData.username,
+	// 			email: formData.email,
+	// 			password: formData.password,
+	// 			id: '',
+	// 			tasks: [],
+	// 			columns: [],
+	// 		};
+	//
+	// 		try {
+	// 			newUser.id = await registerUser(newUser);
+	//
+	// 			store.login(newUser);
+	// 		} catch (err) {
+	// 			showMessage('Use another email');
+	// 		}
+	// 	}
+	//
+	// }
 
 	async handleLogout() {
 		await store.logout();

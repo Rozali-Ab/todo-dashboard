@@ -1,5 +1,5 @@
 import {getUserData, removeColumn, removeTask, setColumn, setTask} from '../firebase/data.ts';
-import {useForm} from '../components/forms/useForm.ts';
+import {useForm} from '../components/AppModal/forms/useForm.ts';
 import type {ColumnType, TaskType, UserType} from '../types/types.ts';
 import Store from './Store.ts';
 

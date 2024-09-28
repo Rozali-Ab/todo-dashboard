@@ -1,5 +1,7 @@
 import AppModal from '../AppModal.ts';
+import {columnFormTemplate} from './templates/columnFormTemplate.ts';
 import {authenticationFormTemplate} from './templates/authenticationFormTemplate.ts';
+import {taskFormTemplate} from './templates/taskFormTemplate.ts';
 import {getFormData} from './utils/getFormData.ts';
 
 interface FormData {
@@ -49,19 +51,19 @@ export const useForm = () => {
 
 	};
 
-	// const showColumnForm = (title?: string): Promise<FormData | null> => {
-	// 	return showForm(() => columnFormTemplate(title));
-	// };
-	//
-	// const showTaskForm = (title?: string): Promise<FormData | null> => {
-	// 	return showForm(() => taskFormTemplate(title));
-	// };
+	const showColumnForm = (title?: string): Promise<FormData | null> => {
+		return showForm(() => columnFormTemplate(title));
+	};
+
+	const showTaskForm = (title?: string): Promise<FormData | null> => {
+		return showForm(() => taskFormTemplate(title));
+	};
 
 	return {
 		form,
 		modal,
 		showAuthForm,
-		// showColumnForm,
-		// showTaskForm,
+		showColumnForm,
+		showTaskForm,
 	};
 };
